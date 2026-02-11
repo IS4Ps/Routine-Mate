@@ -1,0 +1,25 @@
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Backend (Node.js)
+server/node_modules/
+server/.env
+server/npm-debug.log*
+
+# Frontend (Flutter)
+client/.dart_tool/
+client/.flutter-plugins
+client/.flutter-plugins-dependencies
+client/.pub/
+client/build/
+client/flutter_01.log
+
+# Android/iOS generated
+client/android/app/debug/
+client/android/app/profile/
+client/android/app/release/
+client/ios/Flutter/App.framework
+client/ios/Flutter/Flutter.framework
