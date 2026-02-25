@@ -36,4 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-server/src/main/resources/application.properties
+# DB 비밀번호 등 민감한 환경설정 파일 Git 업로드 방지
+**/application.properties
