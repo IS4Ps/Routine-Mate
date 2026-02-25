@@ -1,4 +1,4 @@
-package com.hansung.adhd.domain;
+package com.hansung.adhd.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,31 +9,30 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Family_Relations")
-public class FamilyRelations {
+@Table(name = "Routine_Presets")
+public class RoutinePresets {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "relation_id")
+    @Column(name = "preset_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Parents parent;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "child_id")
-    private Children child;
+    @Column(length = 100)
+    private String title;
 
-    @Column(name = "relation_type", length = 20)
-    private String relationType;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
-    @Column(name = "access_level", length = 20)
-    private String accessLevel;
-
-    @Column(name = "is_primary")
-    private Boolean isPrimary = false;
+    @Column(length = 50)
+    private String icon;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;

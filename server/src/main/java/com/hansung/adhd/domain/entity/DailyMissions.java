@@ -1,4 +1,4 @@
-package com.hansung.adhd.domain;
+package com.hansung.adhd.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

@@ -1,4 +1,4 @@
-package com.hansung.adhd.domain;
+package com.hansung.adhd.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,27 +9,24 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Offline_Rewards")
-public class OfflineRewards {
+@Table(name = "Preset_Big_Tasks")
+public class PresetBigTasks {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reward_id")
+    @Column(name = "big_task_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "child_id")
-    private Children child;
+    @JoinColumn(name = "preset_id")
+    private RoutinePresets preset;
 
-    @Column(name = "period_type", length = 20)
-    private String periodType;
+    @Column(length = 100)
+    private String title;
 
-    @Column(name = "target_percent")
-    private Integer targetPercent;
+    @Column(length = 50)
+    private String icon;
 
-    @Column(name = "reward_promise_text", length = 255)
-    private String rewardPromiseText;
-
-    @Column(length = 20)
-    private String status;
+    @Column(name = "order_index")
+    private Integer orderIndex;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

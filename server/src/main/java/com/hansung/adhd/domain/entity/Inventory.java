@@ -1,4 +1,4 @@
-package com.hansung.adhd.domain;
+package com.hansung.adhd.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,24 +9,26 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Routine_Presets")
-public class RoutinePresets {
+@Table(name = "Inventory")
+public class Inventory {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "preset_id")
+    @Column(name = "inventory_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Parents parent;
+    @JoinColumn(name = "child_id")
+    private Children child;
 
-    @Column(length = 100)
-    private String title;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Items item;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    @Column(name = "is_equipped")
+    private Boolean isEquipped = false;
 
-    @Column(length = 50)
-    private String icon;
+    private Integer quantity = 1;
+
+    private Long version = 1L;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

@@ -1,4 +1,4 @@
-package com.hansung.adhd.domain;
+package com.hansung.adhd.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Mood_Logs")
-public class MoodLogs {
+@Table(name = "External_Activity_Logs")
+public class ExternalActivityLogs {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "mood_id")
+    @Column(name = "log_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,13 +22,22 @@ public class MoodLogs {
 
     private LocalDate date;
 
-    @Column(name = "primary_emotion", length = 50)
-    private String primaryEmotion;
+    @Column(name = "activity_type", length = 50)
+    private String activityType;
 
-    @Column(name = "secondary_emotion", length = 50)
-    private String secondaryEmotion;
+    private Integer value;
 
-    private Integer score;
+    @Column(name = "rewarded_exp")
+    private Integer rewardedExp;
+
+    @Column(name = "rewarded_stat_type", length = 50)
+    private String rewardedStatType;
+
+    @Column(name = "rewarded_stat_amount")
+    private Integer rewardedStatAmount;
+
+    @Column(name = "synced_at")
+    private LocalDateTime syncedAt;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

@@ -1,32 +1,34 @@
-package com.hansung.adhd.domain;
+package com.hansung.adhd.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Preset_Big_Tasks")
-public class PresetBigTasks {
+@Table(name = "Mood_Logs")
+public class MoodLogs {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "big_task_id")
+    @Column(name = "mood_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "preset_id")
-    private RoutinePresets preset;
+    @JoinColumn(name = "child_id")
+    private Children child;
 
-    @Column(length = 100)
-    private String title;
+    private LocalDate date;
 
-    @Column(length = 50)
-    private String icon;
+    @Column(name = "primary_emotion", length = 50)
+    private String primaryEmotion;
 
-    @Column(name = "order_index")
-    private Integer orderIndex;
+    @Column(name = "secondary_emotion", length = 50)
+    private String secondaryEmotion;
+
+    private Integer score;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
