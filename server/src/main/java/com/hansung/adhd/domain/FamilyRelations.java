@@ -1,13 +1,14 @@
 package com.hansung.adhd.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Builder // (데이터를 쉽게 조립하게 해줌)
+@AllArgsConstructor // (빌더를 쓰기 위한 필수 짝꿍)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Family_Relations")
 public class FamilyRelations {
