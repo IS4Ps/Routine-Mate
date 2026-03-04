@@ -5,7 +5,6 @@ import com.hansung.adhd.response.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -42,14 +41,6 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(400, errorMessage));
     }
 
-    // ── Spring Security 접근 거부 ──────────────────────────────────────────────
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiResponse<Void>> handleAccessDeniedException(AccessDeniedException e) {
-        log.warn("[AccessDeniedException] {}", e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(ApiResponse.of(ErrorCode.FORBIDDEN));
-    }
 
     // ── 최종 안전망 ───────────────────────────────────────────────────────────
     @ExceptionHandler(Exception.class)
