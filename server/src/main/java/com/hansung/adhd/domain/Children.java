@@ -1,9 +1,9 @@
 package com.hansung.adhd.domain;
+import com.hansung.adhd.entity.BaseEntity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Children")
-public class Children {
+public class Children extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "child_id")
     private Long id;
@@ -42,14 +42,6 @@ public class Children {
     @Column(name = "last_connected_device_id", length = 100)
     private String lastConnectedDeviceId;
 
-    private Long version = 1L;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
 }

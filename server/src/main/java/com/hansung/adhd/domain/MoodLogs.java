@@ -1,17 +1,17 @@
 package com.hansung.adhd.domain;
+import com.hansung.adhd.entity.BaseEntity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Mood_Logs")
-public class MoodLogs {
+public class MoodLogs extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mood_id")
     private Long id;
@@ -30,12 +30,6 @@ public class MoodLogs {
 
     private Integer score;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
 }

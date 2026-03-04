@@ -1,16 +1,16 @@
 package com.hansung.adhd.domain;
+import com.hansung.adhd.entity.BaseEntity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "AI_Generated_Quizzes")
-public class AIGeneratedQuizzes {
+public class AIGeneratedQuizzes extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "quiz_id")
     private Long id;
@@ -43,6 +43,4 @@ public class AIGeneratedQuizzes {
     @Column(name = "is_correct")
     private Boolean isCorrect;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
 }

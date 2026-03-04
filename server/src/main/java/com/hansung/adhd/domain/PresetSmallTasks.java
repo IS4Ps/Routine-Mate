@@ -1,16 +1,16 @@
 package com.hansung.adhd.domain;
+import com.hansung.adhd.entity.BaseEntity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Preset_Small_Tasks")
-public class PresetSmallTasks {
+public class PresetSmallTasks extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "small_task_id")
     private Long id;
@@ -31,12 +31,6 @@ public class PresetSmallTasks {
     @Column(name = "order_index")
     private Integer orderIndex;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
 }

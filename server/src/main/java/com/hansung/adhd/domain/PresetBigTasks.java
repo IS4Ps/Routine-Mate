@@ -1,16 +1,16 @@
 package com.hansung.adhd.domain;
+import com.hansung.adhd.entity.BaseEntity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Preset_Big_Tasks")
-public class PresetBigTasks {
+public class PresetBigTasks extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "big_task_id")
     private Long id;
@@ -28,12 +28,6 @@ public class PresetBigTasks {
     @Column(name = "order_index")
     private Integer orderIndex;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
 }

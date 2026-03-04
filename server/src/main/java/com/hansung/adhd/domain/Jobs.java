@@ -1,16 +1,16 @@
 package com.hansung.adhd.domain;
 
+import com.hansung.adhd.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Jobs")
-public class Jobs {
+public class Jobs extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "job_id")
     private Long id;
@@ -32,10 +32,4 @@ public class Jobs {
 
     @Column(name = "base_creativity")
     private Integer baseCreativity;
-
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
 }

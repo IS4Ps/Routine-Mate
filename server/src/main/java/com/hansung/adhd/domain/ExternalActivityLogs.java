@@ -1,4 +1,5 @@
 package com.hansung.adhd.domain;
+import com.hansung.adhd.entity.BaseEntity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "External_Activity_Logs")
-public class ExternalActivityLogs {
+public class ExternalActivityLogs extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "log_id")
     private Long id;
@@ -39,12 +40,6 @@ public class ExternalActivityLogs {
     @Column(name = "synced_at")
     private LocalDateTime syncedAt;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
 }

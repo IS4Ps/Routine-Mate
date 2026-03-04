@@ -1,9 +1,9 @@
 package com.hansung.adhd.domain;
+import com.hansung.adhd.entity.BaseEntity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor // (빌더를 쓰기 위한 필수 짝꿍)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Family_Relations")
-public class FamilyRelations {
+public class FamilyRelations extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "relation_id")
     private Long id;
@@ -33,9 +33,5 @@ public class FamilyRelations {
     @Column(name = "is_primary")
     private Boolean isPrimary = false;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
 }
