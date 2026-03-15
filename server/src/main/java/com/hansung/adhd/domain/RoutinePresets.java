@@ -28,6 +28,28 @@ public class RoutinePresets extends BaseEntity {
     @Column(length = 50)
     private String icon;
 
+    // 프리셋이 몇 일짜리인지 (1일짜리, 3일짜리 등)
+    @Column(name = "duration_days")
+    private Integer durationDays;
 
+    // ── 정적 팩토리 ──────────────────────────────────────────────────────────
+    public static RoutinePresets create(Parents parent, String title,
+                                        String description, String icon,
+                                        Integer durationDays) {
+        RoutinePresets preset = new RoutinePresets();
+        preset.parent      = parent;
+        preset.title       = title;
+        preset.description = description;
+        preset.icon        = icon;
+        preset.durationDays = durationDays;
+        return preset;
+    }
 
+    // ── 수정 메서드 ───────────────────────────────────────────────────────────
+    public void update(String title, String description, String icon, Integer durationDays) {
+        this.title        = title;
+        this.description  = description;
+        this.icon         = icon;
+        this.durationDays = durationDays;
+    }
 }

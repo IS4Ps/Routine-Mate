@@ -29,5 +29,28 @@ public class PresetBigTasks extends BaseEntity {
     private Integer orderIndex;
 
 
+    // 이 할일을 시작할 시간 (예: "09:00")
+    @Column(name = "start_time", length = 10)
+    private String startTime;
 
+    // ── 정적 팩토리 ──────────────────────────────────────────────────────────
+    public static PresetBigTasks create(RoutinePresets preset, String title,
+                                        String icon, Integer orderIndex,String startTime) {
+        PresetBigTasks bigTask = new PresetBigTasks();
+        bigTask.preset     = preset;
+        bigTask.title      = title;
+        bigTask.icon       = icon;
+        bigTask.orderIndex = orderIndex;
+        bigTask.startTime  = startTime;
+        return bigTask;
+    }
+
+    // ── 수정 메서드 ───────────────────────────────────────────────────────────
+    public void update(String title, String icon, Integer orderIndex,
+                       Integer dayOffset, String startTime) {
+        this.title      = title;
+        this.icon       = icon;
+        this.orderIndex = orderIndex;
+        this.startTime  = startTime;
+    }
 }

@@ -45,6 +45,8 @@ public enum ErrorCode {
     MISSION_ALREADY_APPROVED(400,  "이미 승인 처리된 미션입니다."),
     MISSION_NOT_PENDING(400,     "승인 대기 상태의 미션이 아닙니다."),
     PRESET_NOT_FOUND(404,        "프리셋을 찾을 수 없습니다."),
+    INVALID_MISSION_STATUS(400, "올바르지 않은 미션 상태입니다."),
+
 
     // ── 아이템 / 인벤토리 ─────────────────────────────────
     ITEM_NOT_FOUND(404,          "아이템을 찾을 수 없습니다."),
@@ -66,6 +68,7 @@ public enum ErrorCode {
     AI_REQUEST_FAILED(500,       "AI 요청 처리에 실패했습니다."),
     QUIZ_NOT_FOUND(404,          "퀴즈를 찾을 수 없습니다."),
     QUIZ_ALREADY_SOLVED(400,     "이미 풀었던 퀴즈입니다.");
+
 
     private final int    code;
     private final String message;
