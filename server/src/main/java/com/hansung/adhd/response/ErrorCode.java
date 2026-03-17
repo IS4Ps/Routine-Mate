@@ -55,6 +55,8 @@ public enum ErrorCode {
     INVENTORY_NOT_FOUND(404,     "인벤토리 항목을 찾을 수 없습니다."),
     ITEM_LEVEL_REQUIRED(400,     "아이템 구매 가능 레벨이 부족합니다."),
     ITEM_JOB_MISMATCH(400,       "해당 직업으로 구매할 수 없는 아이템입니다."),
+    INSUFFICIENT_LEVEL(400, "레벨이 부족합니다."),
+    JOB_NOT_MATCHED(400, "직업이 맞지 않는 아이템입니다."),
 
     // ── 보상 (REWARD) ─────────────────────────────────────
     REWARD_NOT_FOUND(404,        "보상을 찾을 수 없습니다."),
