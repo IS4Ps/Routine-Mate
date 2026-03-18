@@ -32,4 +32,27 @@ public class PresetController {
             @PathVariable Long presetId) {
         return ResponseEntity.ok(ApiResponse.ok(presetService.getPresetDetail(presetId)));
     }
+
+    @Operation(summary = "프리셋 생성", description = "새 루틴 프리셋을 생성합니다. BigTask와 SmallTask를 함께 생성할 수 있습니다.")
+    @PostMapping
+    public ResponseEntity<ApiResponse<PresetDto.PresetResponse>> createPreset(
+            @RequestBody PresetDto.CreateRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(presetService.createPreset(request)));
+    }
+
+    @Operation(summary = "프리셋 수정", description = "프리셋 기본 정보를 수정합니다.")
+    @PutMapping("/{presetId}")
+    public ResponseEntity<ApiResponse<PresetDto.PresetResponse>> updatePreset(
+            @PathVariable Long presetId,
+            @RequestBody PresetDto.UpdateRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(presetService.updatePreset(presetId, request)));
+    }
+
+    @Operation(summary = "프리셋 삭제", description = "프리셋을 삭제합니다. (소프트 삭제)")
+    @DeleteMapping("/{presetId}")
+    public ResponseEntity<ApiResponse<Void>> deletePreset(
+            @PathVariable Long presetId) {
+        presetService.deletePreset(presetId);
+        return ResponseEntity.ok(ApiResponse.noContent());
+    }
 }

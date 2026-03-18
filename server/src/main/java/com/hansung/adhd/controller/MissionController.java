@@ -26,6 +26,13 @@ public class MissionController {
         return ResponseEntity.ok(ApiResponse.ok(missionService.getTodayMissions(childId)));
     }
 
+    @Operation(summary = "미션 직접 생성", description = "프리셋 없이 미션을 직접 생성합니다.")
+    @PostMapping
+    public ResponseEntity<ApiResponse<MissionDto.MissionResponse>> createMission(
+            @RequestBody MissionDto.CreateRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(missionService.createMission(request)));
+    }
+
     @Operation(summary = "미션 완료 처리", description = "아이가 미션 완료 버튼을 눌렀을 때 호출합니다.")
     @PatchMapping("/{missionId}/complete")
     public ResponseEntity<ApiResponse<MissionDto.MissionResponse>> completeMission(

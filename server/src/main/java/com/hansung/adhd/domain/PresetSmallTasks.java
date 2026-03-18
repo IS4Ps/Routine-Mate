@@ -31,6 +31,15 @@ public class PresetSmallTasks extends BaseEntity {
     @Column(name = "order_index")
     private Integer orderIndex;
 
-
+    public static PresetSmallTasks create(PresetBigTasks bigTask, String title,
+                                          String tags, String difficultyLevel, Integer orderIndex) {
+        PresetSmallTasks smallTask = new PresetSmallTasks();
+        smallTask.bigTask = bigTask;
+        smallTask.title = title;
+        smallTask.tags = tags;
+        smallTask.difficultyLevel = difficultyLevel;
+        smallTask.orderIndex = orderIndex;
+        return smallTask;
+    }
 
 }

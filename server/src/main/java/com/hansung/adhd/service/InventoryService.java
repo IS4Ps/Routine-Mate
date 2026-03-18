@@ -38,12 +38,29 @@ public class InventoryService {
         Items item = itemsRepository.findById(itemId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
+        Children child = childrenRepository.findById(childId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+
         // 중복 구매 방지
         inventoryRepository.findByChildIdAndItemId(childId, itemId)
                 .ifPresent(inv -> { throw new CustomException(ErrorCode.ITEM_ALREADY_OWNED); });
 
-        Children child = childrenRepository.findById(childId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+        // 레벨 조건 검증
+        if (child.getLevel() < item.getRequiredLevel()) {
+            throw new CustomException(ErrorCode.INSUFFICIENT_LEVEL);
+        }
+
+        // 직업 조건 검증
+        if (item.getRequiredJob() != null &&
+                !item.getRequiredJob().getId().equals(child.getJob().getId())) {
+            throw new CustomException(ErrorCode.JOB_NOT_MATCHED);
+        }
+
+        // TODO: A 머지 후 골드 차감 추가
+        // if (child.getGold() < item.getPrice()) {
+        //     throw new CustomException(ErrorCode.INSUFFICIENT_GOLD);
+        // }
+        // child.useGold(item.getPrice());
 
         Inventory inventory = Inventory.create(child, item);
         inventoryRepository.save(inventory);
@@ -52,7 +69,7 @@ public class InventoryService {
                 .inventoryId(inventory.getId())
                 .itemId(item.getId())
                 .itemName(item.getName())
-                .remainingGold(null)
+                .remainingGold(null) // TODO: A 머지 후 실제 잔여 골드로 교체
                 .build();
     }
 

@@ -4,6 +4,7 @@ import com.hansung.adhd.domain.Children;
 import com.hansung.adhd.domain.DailyMissions;
 import com.hansung.adhd.dto.MissionDto;
 import com.hansung.adhd.exception.CustomException;
+import com.hansung.adhd.repository.ChildrenRepository;
 import com.hansung.adhd.repository.DailyMissionsRepository;
 import com.hansung.adhd.response.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class MissionService {
 
     private final DailyMissionsRepository dailyMissionsRepository;
+    private final ChildrenRepository childrenRepository;
 
     // 오늘의 미션 목록 조회
     @Transactional(readOnly = true)
@@ -30,9 +32,12 @@ public class MissionService {
                 .collect(Collectors.toList());
     }
 
-    // 미션 생성 (부모가 아이에게 할당)
+    // 미션 직접 생성 (프리셋 없이)
     @Transactional
-    public MissionDto.MissionResponse createMission(MissionDto.CreateRequest request, Children child) {
+    public MissionDto.MissionResponse createMission(MissionDto.CreateRequest request) {
+        Children child = childrenRepository.findById(request.getChildId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+
         DailyMissions mission = DailyMissions.create(
                 child,
                 request.getOriginPresetId(),

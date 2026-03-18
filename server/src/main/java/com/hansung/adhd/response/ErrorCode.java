@@ -48,6 +48,8 @@ public enum ErrorCode {
     INVALID_MISSION_STATUS(400, "올바르지 않은 미션 상태입니다."),
 
 
+
+
     // ── 아이템 / 인벤토리 ─────────────────────────────────
     ITEM_NOT_FOUND(404,          "아이템을 찾을 수 없습니다."),
     INSUFFICIENT_GOLD(400,       "골드가 부족합니다."),
