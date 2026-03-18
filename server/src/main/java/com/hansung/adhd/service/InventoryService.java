@@ -1,9 +1,11 @@
 package com.hansung.adhd.service;
 
+import com.hansung.adhd.domain.Children;
 import com.hansung.adhd.domain.Inventory;
 import com.hansung.adhd.domain.Items;
 import com.hansung.adhd.dto.InventoryDto;
 import com.hansung.adhd.exception.CustomException;
+import com.hansung.adhd.repository.ChildrenRepository;
 import com.hansung.adhd.repository.InventoryRepository;
 import com.hansung.adhd.repository.ItemsRepository;
 import com.hansung.adhd.response.ErrorCode;
@@ -19,6 +21,7 @@ public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
     private final ItemsRepository itemsRepository;
+    private final ChildrenRepository childrenRepository;
 
     // 인벤토리 조회
     @Transactional(readOnly = true)
@@ -30,7 +33,6 @@ public class InventoryService {
     }
 
     // 아이템 구매
-    // TODO: A의 Children 완성 후 childId로 Children 조회 + 골드 차감 로직 추가
     @Transactional
     public InventoryDto.PurchaseResponse purchaseItem(Long itemId, Long childId) {
         Items item = itemsRepository.findById(itemId)
@@ -40,14 +42,17 @@ public class InventoryService {
         inventoryRepository.findByChildIdAndItemId(childId, itemId)
                 .ifPresent(inv -> { throw new CustomException(ErrorCode.ITEM_ALREADY_OWNED); });
 
-        Inventory inventory = Inventory.create(childId, item);
+        Children child = childrenRepository.findById(childId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+
+        Inventory inventory = Inventory.create(child, item);
         inventoryRepository.save(inventory);
 
         return InventoryDto.PurchaseResponse.builder()
                 .inventoryId(inventory.getId())
                 .itemId(item.getId())
                 .itemName(item.getName())
-                .remainingGold(null) // TODO: A 머지 후 실제 잔여 골드로 교체
+                .remainingGold(null)
                 .build();
     }
 

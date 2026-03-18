@@ -39,6 +39,8 @@ public class SecurityConfig {
                         // /swagger-ui.html 을 명시적으로 추가!
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/auth/child/login").permitAll()
+                        //임시 테스트용 item 접근 권한 무시 *****추후에 삭제 필요*****!!!!!
+                        .requestMatchers("/api/v1/items/**", "/api/jobs").permitAll()
                         // 그 외의 모든 찔러보기(API 요청)는 무조건 인증(토큰)을 거쳐야 함
                         .anyRequest().authenticated()
                 )

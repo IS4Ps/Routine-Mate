@@ -4,6 +4,7 @@ import com.hansung.adhd.domain.PresetBigTasks;
 import com.hansung.adhd.domain.PresetSmallTasks;
 import com.hansung.adhd.dto.PresetDto;
 import com.hansung.adhd.exception.CustomException;
+import com.hansung.adhd.repository.ParentsRepository;
 import com.hansung.adhd.repository.PresetBigTasksRepository;
 import com.hansung.adhd.repository.PresetSmallTasksRepository;
 import com.hansung.adhd.repository.RoutinePresetsRepository;
@@ -23,10 +24,17 @@ public class PresetService {
     private final RoutinePresetsRepository routinePresetsRepository;
     private final PresetBigTasksRepository presetBigTasksRepository;
     private final PresetSmallTasksRepository presetSmallTasksRepository;
+    private final ParentsRepository parentsRepository;
+
 
     // 부모의 프리셋 목록 조회
     @Transactional(readOnly = true)
     public List<PresetDto.PresetResponse> getPresets(Long parentId) {
+
+        // 부모 존재 여부 확인 - 추가
+        parentsRepository.findById(parentId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PARENT_NOT_FOUND));
+
         return routinePresetsRepository.findByParentId(parentId)
                 .stream()
                 .map(PresetDto.PresetResponse::from)
