@@ -1,6 +1,8 @@
 package com.hansung.adhd.domain;
 import com.hansung.adhd.entity.BaseEntity;
 
+import com.hansung.adhd.exception.CustomException;
+import com.hansung.adhd.response.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -33,6 +35,14 @@ public class Items extends BaseEntity {
     @Column(name = "required_level")
     private Integer requiredLevel;
 
+    public void validatePurchasable(Integer childLevel, Long childJobId) {
+        if (childLevel < this.requiredLevel) {
+            throw new CustomException(ErrorCode.INSUFFICIENT_LEVEL);
+        }
+        if (this.requiredJob != null && !this.requiredJob.getId().equals(childJobId)) {
+            throw new CustomException(ErrorCode.JOB_NOT_MATCHED);
+        }
+    }
 
 
 }

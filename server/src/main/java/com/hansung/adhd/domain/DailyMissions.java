@@ -59,6 +59,43 @@ public class DailyMissions extends BaseEntity {
     @Column(name = "reject_reason", length = 255)
     private String rejectReason;
 
+    public void complete(LocalDateTime completedAt) {
+        this.status = "COMPLETED";
+        this.completedAt = completedAt;
+    }
 
+    public void approve(LocalDateTime approvedAt) {
+        this.status = "APPROVED";
+        this.approvedAt = approvedAt;
+    }
 
+    public void reject(String rejectReason) {
+        this.status = "REJECTED";
+        this.rejectReason = rejectReason;
+    }
+
+    public static DailyMissions create(
+            Children child,
+            Long originPresetId,
+            Long originBigTaskId,
+            String presetTitle,
+            String bigTaskTitle,
+            String smallTaskTitle,
+            String tags,
+            Integer assignedExp,
+            LocalDate date
+    ) {
+        DailyMissions mission = new DailyMissions();
+        mission.child = child;
+        mission.originPresetId = originPresetId;
+        mission.originBigTaskId = originBigTaskId;
+        mission.presetTitle = presetTitle;
+        mission.bigTaskTitle = bigTaskTitle;
+        mission.smallTaskTitle = smallTaskTitle;
+        mission.tags = tags;
+        mission.assignedExp = assignedExp;
+        mission.date = date;
+        mission.status = "PENDING";
+        return mission;
+    }
 }
