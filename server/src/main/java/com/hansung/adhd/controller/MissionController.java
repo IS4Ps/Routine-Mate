@@ -19,18 +19,25 @@ public class MissionController {
 
     private final MissionService missionService;
 
-    @Operation(summary = "오늘의 미션 목록 조회", description = "아이의 오늘 할당된 미션 목록을 조회합니다.")
+    @Operation(summary = "오늘의 미션 목록 조회", description = "아이의 오늘 미션 목록을 조회합니다.")
     @GetMapping("/today/{childId}")
     public ResponseEntity<ApiResponse<List<MissionDto.MissionResponse>>> getTodayMissions(
             @PathVariable Long childId) {
         return ResponseEntity.ok(ApiResponse.ok(missionService.getTodayMissions(childId)));
     }
 
-    @Operation(summary = "미션 직접 생성", description = "프리셋 없이 미션을 직접 생성합니다.")
+    @Operation(summary = "미션 생성", description = "BigTask를 선택하면 미션이 생성됩니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<MissionDto.MissionResponse>> createMission(
             @RequestBody MissionDto.CreateRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(missionService.createMission(request)));
+    }
+
+    @Operation(summary = "미션 시작", description = "아이가 퀘스트 시작 버튼을 눌렀을 때 호출합니다.")
+    @PatchMapping("/{missionId}/start")
+    public ResponseEntity<ApiResponse<MissionDto.MissionResponse>> startMission(
+            @PathVariable Long missionId) {
+        return ResponseEntity.ok(ApiResponse.ok(missionService.startMission(missionId)));
     }
 
     @Operation(summary = "미션 완료 처리", description = "아이가 미션 완료 버튼을 눌렀을 때 호출합니다.")

@@ -46,6 +46,7 @@ public enum ErrorCode {
     MISSION_NOT_PENDING(400,     "승인 대기 상태의 미션이 아닙니다."),
     PRESET_NOT_FOUND(404,        "프리셋을 찾을 수 없습니다."),
     INVALID_MISSION_STATUS(400, "올바르지 않은 미션 상태입니다."),
+    BIG_TASK_NOT_FOUND(404, "빅태스크를 찾을 수 없습니다."),
 
 
 

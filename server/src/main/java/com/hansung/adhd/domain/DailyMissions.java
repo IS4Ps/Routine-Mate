@@ -59,6 +59,12 @@ public class DailyMissions extends BaseEntity {
     @Column(name = "reject_reason", length = 255)
     private String rejectReason;
 
+    @Column(name = "start_time", length = 10)
+    private String startTime;
+
+    @Column(name = "end_time", length = 10)
+    private String endTime;
+
     public void complete(LocalDateTime completedAt) {
         this.status = "COMPLETED";
         this.completedAt = completedAt;
@@ -74,16 +80,22 @@ public class DailyMissions extends BaseEntity {
         this.rejectReason = rejectReason;
     }
 
+    public void start(LocalDateTime startedAt) {
+        this.status = "IN_PROGRESS";
+        this.startedAt = startedAt;
+    }
+
     public static DailyMissions create(
             Children child,
             Long originPresetId,
             Long originBigTaskId,
             String presetTitle,
             String bigTaskTitle,
-            String smallTaskTitle,
             String tags,
             Integer assignedExp,
-            LocalDate date
+            LocalDate date,
+            String startTime,
+            String endTime
     ) {
         DailyMissions mission = new DailyMissions();
         mission.child = child;
@@ -91,10 +103,11 @@ public class DailyMissions extends BaseEntity {
         mission.originBigTaskId = originBigTaskId;
         mission.presetTitle = presetTitle;
         mission.bigTaskTitle = bigTaskTitle;
-        mission.smallTaskTitle = smallTaskTitle;
         mission.tags = tags;
         mission.assignedExp = assignedExp;
         mission.date = date;
+        mission.startTime = startTime;
+        mission.endTime = endTime;
         mission.status = "PENDING";
         return mission;
     }

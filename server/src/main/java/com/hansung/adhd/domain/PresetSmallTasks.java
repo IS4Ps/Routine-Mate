@@ -32,7 +32,8 @@ public class PresetSmallTasks extends BaseEntity {
     private Integer orderIndex;
 
     public static PresetSmallTasks create(PresetBigTasks bigTask, String title,
-                                          String tags, String difficultyLevel, Integer orderIndex) {
+                                          String tags, String difficultyLevel,
+                                          Integer orderIndex) {
         PresetSmallTasks smallTask = new PresetSmallTasks();
         smallTask.bigTask = bigTask;
         smallTask.title = title;

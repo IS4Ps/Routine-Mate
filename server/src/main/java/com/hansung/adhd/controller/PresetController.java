@@ -33,7 +33,7 @@ public class PresetController {
         return ResponseEntity.ok(ApiResponse.ok(presetService.getPresetDetail(presetId)));
     }
 
-    @Operation(summary = "프리셋 생성", description = "새 루틴 프리셋을 생성합니다. BigTask와 SmallTask를 함께 생성할 수 있습니다.")
+    @Operation(summary = "프리셋 생성", description = "기존 BigTask들을 묶어서 프리셋을 생성합니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<PresetDto.PresetResponse>> createPreset(
             @RequestBody PresetDto.CreateRequest request) {

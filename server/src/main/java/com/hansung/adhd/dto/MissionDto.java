@@ -4,38 +4,33 @@ import com.hansung.adhd.domain.DailyMissions;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class MissionDto {
 
-    /** 미션 생성 요청 (부모가 아이한테 미션 할당) */
+    /** 미션 생성 요청 */
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class CreateRequest {
-        private Long   childId;
-        private Long   originPresetId;
-        private Long   originBigTaskId;
-        private String presetTitle;
-        private String bigTaskTitle;
-        private String smallTaskTitle;
-        private String tags;
-        private Integer assignedExp;
+        private Long      childId;
+        private Long      originBigTaskId;
+        private Integer   assignedExp;
         private LocalDate date;
+        private String    startTime; // "08:30"
+        private String    endTime;   // "09:30"
     }
 
-    /** 미션 완료 요청 (아이가 완료 버튼 누를 때) */
+    /** 미션 승인/거절 요청 */
     @Getter
-    public static class CompleteRequest {
-        private LocalDateTime completedAt;
-    }
-
-    /** 미션 승인/거절 요청 (부모가 검토할 때) */
-    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ReviewRequest {
         private String status;       // APPROVED or REJECTED
-        private String rejectReason; // 거절 시 사유
+        private String rejectReason;
     }
 
     /** 미션 응답 */
@@ -45,10 +40,11 @@ public class MissionDto {
         private Long          missionId;
         private String        presetTitle;
         private String        bigTaskTitle;
-        private String        smallTaskTitle;
         private String        tags;
         private Integer       assignedExp;
         private LocalDate     date;
+        private String        startTime;
+        private String        endTime;
         private String        status;
         private String        rejectReason;
         private LocalDateTime startedAt;
@@ -60,10 +56,11 @@ public class MissionDto {
                     .missionId(mission.getId())
                     .presetTitle(mission.getPresetTitle())
                     .bigTaskTitle(mission.getBigTaskTitle())
-                    .smallTaskTitle(mission.getSmallTaskTitle())
                     .tags(mission.getTags())
                     .assignedExp(mission.getAssignedExp())
                     .date(mission.getDate())
+                    .startTime(mission.getStartTime())
+                    .endTime(mission.getEndTime())
                     .status(mission.getStatus())
                     .rejectReason(mission.getRejectReason())
                     .startedAt(mission.getStartedAt())

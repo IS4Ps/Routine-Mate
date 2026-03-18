@@ -1,8 +1,7 @@
 package com.hansung.adhd.service;
 
-import com.hansung.adhd.domain.PresetBigTasks;
-import com.hansung.adhd.domain.PresetSmallTasks;
 import com.hansung.adhd.domain.Parents;
+import com.hansung.adhd.domain.PresetBigTasks;
 import com.hansung.adhd.domain.RoutinePresets;
 import com.hansung.adhd.dto.PresetDto;
 import com.hansung.adhd.exception.CustomException;
@@ -69,13 +68,12 @@ public class PresetService {
                 .toList();
     }
 
-    // 프리셋 생성
+    // 프리셋 생성 (BigTask들을 묶어서)
     @Transactional
     public PresetDto.PresetResponse createPreset(PresetDto.CreateRequest request) {
         Parents parent = parentsRepository.findById(request.getParentId())
                 .orElseThrow(() -> new CustomException(ErrorCode.PARENT_NOT_FOUND));
 
-        // 프리셋 생성
         RoutinePresets preset = RoutinePresets.create(
                 parent,
                 request.getTitle(),
@@ -85,31 +83,13 @@ public class PresetService {
         );
         routinePresetsRepository.save(preset);
 
-        // BigTask + SmallTask 생성
-        if (request.getBigTasks() != null) {
-            for (PresetDto.BigTaskCreateRequest bigTaskReq : request.getBigTasks()) {
-                PresetBigTasks bigTask = PresetBigTasks.create(
-                        preset,
-                        bigTaskReq.getTitle(),
-                        bigTaskReq.getIcon(),
-                        bigTaskReq.getOrderIndex(),
-                        bigTaskReq.getStartTime()
-                );
-                presetBigTasksRepository.save(bigTask);
-
-                if (bigTaskReq.getSmallTasks() != null) {
-                    for (PresetDto.SmallTaskCreateRequest smallTaskReq : bigTaskReq.getSmallTasks()) {
-                        PresetSmallTasks smallTask = PresetSmallTasks.create(
-                                bigTask,
-                                smallTaskReq.getTitle(),
-                                smallTaskReq.getTags(),
-                                smallTaskReq.getDifficultyLevel(),
-                                smallTaskReq.getOrderIndex()
-                        );
-                        presetSmallTasksRepository.save(smallTask);
-                    }
-                }
-            }
+        // BigTask들을 프리셋에 묶기
+        if (request.getBigTaskIds() != null) {
+            request.getBigTaskIds().forEach(bigTaskId -> {
+                PresetBigTasks bigTask = presetBigTasksRepository.findById(bigTaskId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.BIG_TASK_NOT_FOUND));
+                bigTask.assignToPreset(preset);
+            });
         }
 
         return PresetDto.PresetResponse.from(preset);
@@ -121,12 +101,8 @@ public class PresetService {
         RoutinePresets preset = routinePresetsRepository.findById(presetId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
 
-        preset.update(
-                request.getTitle(),
-                request.getDescription(),
-                request.getIcon(),
-                request.getDurationDays()
-        );
+        preset.update(request.getTitle(), request.getDescription(),
+                request.getIcon(), request.getDurationDays());
 
         return PresetDto.PresetResponse.from(preset);
     }
@@ -136,7 +112,6 @@ public class PresetService {
     public void deletePreset(Long presetId) {
         RoutinePresets preset = routinePresetsRepository.findById(presetId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
-
-        preset.delete(); // 소프트 삭제
+        preset.delete();
     }
 }

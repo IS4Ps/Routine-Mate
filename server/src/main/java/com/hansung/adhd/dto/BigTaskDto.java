@@ -2,7 +2,6 @@ package com.hansung.adhd.dto;
 
 import com.hansung.adhd.domain.PresetBigTasks;
 import com.hansung.adhd.domain.PresetSmallTasks;
-import com.hansung.adhd.domain.RoutinePresets;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,51 +9,43 @@ import lombok.AllArgsConstructor;
 
 import java.util.List;
 
-public class PresetDto {
+public class BigTaskDto {
 
-    /** 프리셋 생성 요청 (BigTask 묶음) */
+    /** BigTask 생성 요청 */
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateRequest {
-        private Long        parentId;
-        private String      title;
-        private String      description;
-        private String      icon;
-        private Integer     durationDays;
-        private List<Long>  bigTaskIds; // 묶을 BigTask ID 목록
+        private Long    parentId;
+        private String  title;
+        private String  icon;
+        private Integer orderIndex;
+        private String  startTime;
+        private String  endTime;
+        private List<SmallTaskCreateRequest> smallTasks;
     }
 
-    /** 프리셋 수정 요청 */
+    /** SmallTask 생성 요청 */
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SmallTaskCreateRequest {
+        private String  title;
+        private String  tags;
+        private String  difficultyLevel;
+        private Integer orderIndex;
+    }
+
+    /** BigTask 수정 요청 */
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateRequest {
         private String  title;
-        private String  description;
         private String  icon;
-        private Integer durationDays;
-    }
-
-    /** 프리셋 목록 응답 */
-    @Getter
-    @Builder
-    public static class PresetResponse {
-        private Long    presetId;
-        private String  title;
-        private String  description;
-        private String  icon;
-        private Integer durationDays;
-
-        public static PresetResponse from(RoutinePresets preset) {
-            return PresetResponse.builder()
-                    .presetId(preset.getId())
-                    .title(preset.getTitle())
-                    .description(preset.getDescription())
-                    .icon(preset.getIcon())
-                    .durationDays(preset.getDurationDays())
-                    .build();
-        }
+        private Integer orderIndex;
+        private String  startTime;
+        private String  endTime;
     }
 
     /** SmallTask 응답 */
@@ -88,6 +79,7 @@ public class PresetDto {
         private Integer orderIndex;
         private String  startTime;
         private String  endTime;
+        private Long    presetId; // null이면 프리셋에 안 묶인 상태
         private List<SmallTaskResponse> smallTasks;
 
         public static BigTaskResponse from(PresetBigTasks bigTask, List<SmallTaskResponse> smallTasks) {
@@ -98,6 +90,7 @@ public class PresetDto {
                     .orderIndex(bigTask.getOrderIndex())
                     .startTime(bigTask.getStartTime())
                     .endTime(bigTask.getEndTime())
+                    .presetId(bigTask.getPreset() != null ? bigTask.getPreset().getId() : null)
                     .smallTasks(smallTasks)
                     .build();
         }

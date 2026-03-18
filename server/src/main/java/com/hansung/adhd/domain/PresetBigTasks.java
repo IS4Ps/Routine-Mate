@@ -15,9 +15,14 @@ public class PresetBigTasks extends BaseEntity {
     @Column(name = "big_task_id")
     private Long id;
 
+    // 프리셋에 묶이기 전엔 null, 나중에 프리셋에 묶으면 값이 생김
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "preset_id")
+    @JoinColumn(name = "preset_id", nullable = true)
     private RoutinePresets preset;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Parents parent;
 
     @Column(length = 100)
     private String title;
@@ -28,29 +33,37 @@ public class PresetBigTasks extends BaseEntity {
     @Column(name = "order_index")
     private Integer orderIndex;
 
-
-    // 이 할일을 시작할 시간 (예: "09:00")
     @Column(name = "start_time", length = 10)
     private String startTime;
 
-    // ── 정적 팩토리 ──────────────────────────────────────────────────────────
-    public static PresetBigTasks create(RoutinePresets preset, String title,
-                                        String icon, Integer orderIndex, String startTime) {
+    @Column(name = "end_time", length = 10)
+    private String endTime;
+
+    // ── 정적 팩토리 (프리셋 없이 생성) ───────────────────────────────────────
+    public static PresetBigTasks create(Parents parent, String title, String icon,
+                                        Integer orderIndex, String startTime, String endTime) {
         PresetBigTasks bigTask = new PresetBigTasks();
-        bigTask.preset = preset;
-        bigTask.title = title;
-        bigTask.icon = icon;
+        bigTask.parent     = parent;
+        bigTask.title      = title;
+        bigTask.icon       = icon;
         bigTask.orderIndex = orderIndex;
-        bigTask.startTime = startTime;
+        bigTask.startTime  = startTime;
+        bigTask.endTime    = endTime;
         return bigTask;
     }
 
-    // ── 수정 메서드 ───────────────────────────────────────────────────────────
+    // ── 프리셋에 묶기 ─────────────────────────────────────────────────────────
+    public void assignToPreset(RoutinePresets preset) {
+        this.preset = preset;
+    }
+
+    // ── 수정 ─────────────────────────────────────────────────────────────────
     public void update(String title, String icon, Integer orderIndex,
-                       Integer dayOffset, String startTime) {
+                       String startTime, String endTime) {
         this.title      = title;
         this.icon       = icon;
         this.orderIndex = orderIndex;
         this.startTime  = startTime;
+        this.endTime    = endTime;
     }
 }
