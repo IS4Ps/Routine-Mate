@@ -28,11 +28,12 @@ public class Inventory extends BaseEntity {
 
     private Integer quantity = 1;
 
-    public static Inventory create(Long childId, Items item) {
+    public static Inventory create(Children child, Items item) {
         Inventory inventory = new Inventory();
-        // TODO: A 머지 후 Children 객체로 교체
+        inventory.child = child;
         inventory.item = item;
         inventory.isEquipped = false;
+        inventory.quantity = 1;
         return inventory;
     }
 
