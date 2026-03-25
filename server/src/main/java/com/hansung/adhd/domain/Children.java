@@ -20,6 +20,11 @@ public class Children extends BaseEntity {
     @JoinColumn(name = "job_id")
     private Jobs job;
 
+    // 핵심: 이 아이의 부모님이 누구인지 연결 (N:1 관계)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Parents parent;
+
     @Column(length = 50)
     private String nickname;
 
