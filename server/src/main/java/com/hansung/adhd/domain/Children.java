@@ -47,6 +47,7 @@ public class Children extends BaseEntity {
     @Column(name = "last_connected_device_id", length = 100)
     private String lastConnectedDeviceId;
 
-
-
+    public void updateDevice(String newDeviceId) {
+        this.lastConnectedDeviceId = newDeviceId;
+    }
 }

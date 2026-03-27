@@ -1,6 +1,8 @@
 package com.hansung.adhd.controller;
 
 import com.hansung.adhd.dto.request.ChildCreateRequestDto;
+import com.hansung.adhd.dto.request.ChildDeviceUpdateRequestDto;
+import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.ChildrenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,5 +32,26 @@ public class ChildrenController {
         Long childId = childrenService.createChild(parentId, requestDto);
 
         return ResponseEntity.ok("아이 프로필 생성 성공! 아이 ID: " + childId);
+    }
+
+    /**
+     * [PATCH] 아이 기기 번호 갱신 API
+     */
+    @PatchMapping("/{childId}/device")
+    public ApiResponse<Void> updateChildDevice(
+            @PathVariable Long childId,
+            @RequestBody ChildDeviceUpdateRequestDto requestDto,
+            Authentication authentication) {
+
+        log.info("아이 기기 번호 변경 요청 - childId: {}, newDeviceId: {}", childId, requestDto.newDeviceId());
+
+        // 1. 보안 뱃지(토큰)에서 부모 PK(ID) 꺼내기
+        Long parentId = Long.parseLong(authentication.getName());
+
+        // 2. 매니저(Service)에게 기기 번호 변경 지시!
+        childrenService.updateChildDevice(childId, parentId, requestDto.newDeviceId());
+
+        // 3. 성공 응답 리턴! (돌려줄 데이터가 없으니 성공 코드 201 혹은 200만 쿨하게 던짐)
+        return ApiResponse.noContent();
     }
 }
