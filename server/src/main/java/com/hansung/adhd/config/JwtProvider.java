@@ -106,4 +106,10 @@ public class JwtProvider {
         // 5. 최종적으로 SecurityContext에 들어갈 '인증된 뱃지(Authentication)'를 발급!
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
+    /**
+     * 리프레시 토큰 생성기 (간단하고 강력한 UUID 사용!)
+     */
+    public String createRefreshToken() {
+        return java.util.UUID.randomUUID().toString();
+    }
 }
