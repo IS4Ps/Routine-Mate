@@ -72,7 +72,23 @@ public class MissionService {
     @Transactional
     public MissionDto.MissionResponse completeMission(Long missionId) {
         DailyMissions mission = getMissionOrThrow(missionId);
+
+        // 🚨 중복 완료 방지
+        if ("COMPLETED".equals(mission.getStatus())) {
+            throw new CustomException(ErrorCode.INVALID_MISSION_STATUS); // "올바르지 않은 미션 상태입니다."
+        }
+
+        // 1. 미션 상태를 '완료'로 변경하고 시간 기록
         mission.complete(LocalDateTime.now());
+
+        // 2. 미션을 수행한 아이(Children)를 불러와서 보상
+        Children child = mission.getChild();
+
+        // 아이 엔티티에 만들어둔 도메인 메서드 호출
+        child.gainExp(mission.getAssignedExp()); // 미션에 걸려있던 경험치 그대로 획득!
+        child.addGold(30); // 기본 골드 30 지급 (추후 상의 후 바꾸기)
+
+        // JPA의 '더티 체킹' 덕분에 child.save()를 안 해도 경험치와 골드가 DB에 자동 저장
         return MissionDto.MissionResponse.from(mission);
     }
 

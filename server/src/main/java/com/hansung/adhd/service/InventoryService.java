@@ -56,11 +56,11 @@ public class InventoryService {
             throw new CustomException(ErrorCode.JOB_NOT_MATCHED);
         }
 
-        // TODO: A 머지 후 골드 차감 추가
-        // if (child.getGold() < item.getPrice()) {
-        //     throw new CustomException(ErrorCode.INSUFFICIENT_GOLD);
-        // }
-        // child.useGold(item.getPrice());
+        // ⭐️ [NEW]
+        if (child.getGold() < item.getPrice()) {
+            throw new CustomException(ErrorCode.INSUFFICIENT_GOLD);
+        }
+        child.useGold(item.getPrice()); // 골드 차감
 
         Inventory inventory = Inventory.create(child, item);
         inventoryRepository.save(inventory);
@@ -69,7 +69,7 @@ public class InventoryService {
                 .inventoryId(inventory.getId())
                 .itemId(item.getId())
                 .itemName(item.getName())
-                .remainingGold(null) // TODO: A 머지 후 실제 잔여 골드로 교체
+                .remainingGold(child.getGold()) // ⭐️ [NEW] 아이의 '진짜 남은 골드' 반환!
                 .build();
     }
 
