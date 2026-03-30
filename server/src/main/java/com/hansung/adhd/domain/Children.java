@@ -87,4 +87,8 @@ public class Children extends BaseEntity {
             requiredExp = this.level * 100;
         }
     }
+
+    public void updateNickname(String newNickname) {
+        this.nickname = newNickname;
+    }
 }

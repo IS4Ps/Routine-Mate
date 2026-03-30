@@ -2,6 +2,7 @@ package com.hansung.adhd.controller;
 
 import com.hansung.adhd.dto.request.ChildCreateRequestDto;
 import com.hansung.adhd.dto.request.ChildDeviceUpdateRequestDto;
+import com.hansung.adhd.dto.response.ChildResponseDto;
 import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.ChildrenService;
 import lombok.RequiredArgsConstructor;
@@ -54,4 +55,45 @@ public class ChildrenController {
         // 3. 성공 응답 리턴! (돌려줄 데이터가 없으니 성공 코드 201 혹은 200만 쿨하게 던짐)
         return ApiResponse.noContent();
     }
+    /**
+     * [GET] 아이 상세 정보 및 스탯 조회 API
+     */
+    @GetMapping("/{childId}")
+    public ApiResponse<ChildResponseDto> getChildInfo(
+            @PathVariable Long childId,
+            Authentication authentication) {
+
+        Long parentId = Long.parseLong(authentication.getName()); // 부모님 토큰 확인!
+        return ApiResponse.ok(childrenService.getChildInfo(childId, parentId));
+    }
+
+    /**
+     * [PATCH] 아이 닉네임 수정 API
+     */
+    @PatchMapping("/{childId}/nickname")
+    public ApiResponse<Void> updateChildNickname(
+            @PathVariable Long childId,
+            @RequestBody ChildNicknameRequestDto requestDto,
+            Authentication authentication) {
+
+        Long parentId = Long.parseLong(authentication.getName());
+        childrenService.updateChildNickname(childId, parentId, requestDto.nickname());
+        return ApiResponse.noContent();
+    }
+
+    /**
+     * [DELETE] 아이 계정 삭제 (소프트 삭제) API
+     */
+    @DeleteMapping("/{childId}")
+    public ApiResponse<Void> deleteChild(
+            @PathVariable Long childId,
+            Authentication authentication) {
+
+        Long parentId = Long.parseLong(authentication.getName());
+        childrenService.deleteChild(childId, parentId);
+        return ApiResponse.noContent();
+    }
+
+    // 프론트에서 {"nickname": "새로운이름"} 형태로 보낼 때 받을 미니 DTO
+    public record ChildNicknameRequestDto(String nickname) {}
 }

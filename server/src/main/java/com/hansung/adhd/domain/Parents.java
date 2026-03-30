@@ -26,6 +26,7 @@ public class Parents extends BaseEntity {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
-
-
+    // ⭐️나중에 구글/카카오 소셜 로그인을 위해
+    @Column(length = 50)
+    private String provider;
 }

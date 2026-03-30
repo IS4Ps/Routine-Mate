@@ -63,4 +63,13 @@ public class MissionController {
         // 통계 데이터를 공통 박스에 예쁘게 담아서 리턴!
         return ResponseEntity.ok(ApiResponse.ok(missionService.getWeeklyStatistics(childId)));
     }
+
+    /**
+     * [DELETE] 미션 삭제 (소프트 삭제) API
+     */
+    @DeleteMapping("/{missionId}")
+    public ApiResponse<Void> deleteMission(@PathVariable Long missionId) {
+        missionService.deleteMission(missionId);
+        return ApiResponse.noContent(); // 성공 코드 204(No Content)
+    }
 }

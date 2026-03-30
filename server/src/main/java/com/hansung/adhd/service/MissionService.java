@@ -191,4 +191,14 @@ public class MissionService {
                 .completionRate(rate)
                 .build();
     }
+
+    /**
+     * 미션 삭제 (소프트 삭제)
+     */
+    @Transactional
+    public void deleteMission(Long missionId) {
+        DailyMissions mission = getMissionOrThrow(missionId);
+        // BaseEntity의 delete() 호출! (DB에서 진짜 지우는 게 아니라 is_deleted=true 처리)
+        mission.delete();
+    }
 }

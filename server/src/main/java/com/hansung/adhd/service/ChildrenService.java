@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.hansung.adhd.dto.response.ChildResponseDto;
 
 @Slf4j
 @Service
@@ -69,5 +70,53 @@ public class ChildrenService {
 
         // 4. ⭐️ 기기 번호 갱신! (JPA의 '더티 체킹' 덕분에 save() 안 해도 DB에 알아서 Update 쿼리가 날아감!)
         child.updateDevice(newDeviceId);
+    }
+
+    /**
+     * 아이 상세 스탯 및 정보 조회
+     */
+    @Transactional(readOnly = true)
+    public ChildResponseDto getChildInfo(Long childId, Long parentId) {
+        Children child = childrenRepository.findById(childId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+
+        if (!child.getParent().getId().equals(parentId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
+        return new ChildResponseDto(
+                child.getId(), child.getNickname(), child.getLevel(),
+                child.getCurrentExp(), child.getGold(),
+                child.getStatStrength(), child.getStatIntelligence(), child.getStatCreativity()
+        );
+    }
+
+    /**
+     * 아이 닉네임 수정
+     */
+    @Transactional
+    public void updateChildNickname(Long childId, Long parentId, String newNickname) {
+        Children child = childrenRepository.findById(childId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+
+        if (!child.getParent().getId().equals(parentId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+        child.updateNickname(newNickname);
+    }
+
+    /**
+     * 아이 삭제 (소프트 삭제)
+     */
+    @Transactional
+    public void deleteChild(Long childId, Long parentId) {
+        Children child = childrenRepository.findById(childId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+
+        if (!child.getParent().getId().equals(parentId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+        // BaseEntity에 있는 delete() 메서드를 호출하여 is_deleted = true 로 변경!
+        child.delete();
     }
 }
