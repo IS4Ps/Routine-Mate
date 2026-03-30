@@ -54,4 +54,13 @@ public class MissionController {
             @RequestBody MissionDto.ReviewRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(missionService.reviewMission(missionId, request)));
     }
+
+    @Operation(summary = "주간 미션 통계 조회", description = "부모님 대시보드용! 최근 7일간 아이의 미션 달성률을 조회합니다.")
+    @GetMapping("/{childId}/statistics")
+    public ResponseEntity<ApiResponse<MissionDto.StatisticsResponse>> getWeeklyStatistics(
+            @PathVariable Long childId) {
+
+        // 통계 데이터를 공통 박스에 예쁘게 담아서 리턴!
+        return ResponseEntity.ok(ApiResponse.ok(missionService.getWeeklyStatistics(childId)));
+    }
 }

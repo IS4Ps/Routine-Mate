@@ -69,4 +69,13 @@ public class MissionDto {
                     .build();
         }
     }
+
+    /** 부모님 대시보드용 통계 응답 */
+    @Getter
+    @Builder
+    public static class StatisticsResponse {
+        private Integer totalMissions;     // 이번 주 총 미션 개수
+        private Integer completedMissions; // 완료한 미션 개수
+        private Double completionRate;     // 달성률 (백분율 %)
+    }
 }

@@ -160,4 +160,35 @@ public class MissionService {
         }
         log.info("✅ [배치 작업 완료] 오늘의 미션 복사가 모두 끝났습니다!");
     }
+
+    /**
+     * 주간 미션 달성률 통계 API
+     */
+    @Transactional(readOnly = true)
+    public MissionDto.StatisticsResponse getWeeklyStatistics(Long childId) {
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.minusDays(7); // 오늘 기준 최근 7일!
+
+        // 1. 최근 7일 치 미션을 창고에서 싹 쓸어온다!
+        List<DailyMissions> weeklyMissions = dailyMissionsRepository.findByChildIdAndDateBetween(childId, startOfWeek, today);
+
+        // 2. 전체 미션 개수 파악
+        int total = weeklyMissions.size();
+
+        // 3. 그중에서 상태가 '완료(COMPLETED)'거나 부모님이 '승인(APPROVED)'한 미션만 필터링해서 개수 세기!
+        int completed = (int) weeklyMissions.stream()
+                .filter(m -> "COMPLETED".equals(m.getStatus()) || "APPROVED".equals(m.getStatus()))
+                .count();
+
+        // 4. 달성률 계산 (0으로 나누는 에러 방지 & 소수점 첫째 자리까지만 예쁘게 자르기)
+        double rate = (total == 0) ? 0.0 : Math.round(((double) completed / total) * 1000) / 10.0;
+
+        log.info("📊 통계 산출 완료 - childId: {}, 달성률: {}%", childId, rate);
+
+        return MissionDto.StatisticsResponse.builder()
+                .totalMissions(total)
+                .completedMissions(completed)
+                .completionRate(rate)
+                .build();
+    }
 }
