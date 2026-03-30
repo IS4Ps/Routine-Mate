@@ -1,13 +1,12 @@
 package com.hansung.adhd.service;
 
-import com.hansung.adhd.domain.Children;
-import com.hansung.adhd.domain.DailyMissions;
-import com.hansung.adhd.domain.PresetBigTasks;
+import com.hansung.adhd.domain.*;
 import com.hansung.adhd.dto.MissionDto;
 import com.hansung.adhd.exception.CustomException;
 import com.hansung.adhd.repository.ChildrenRepository;
 import com.hansung.adhd.repository.DailyMissionsRepository;
 import com.hansung.adhd.repository.PresetBigTasksRepository;
+import com.hansung.adhd.repository.RoutinePresetsRepository;
 import com.hansung.adhd.response.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MissionService {
@@ -25,6 +26,7 @@ public class MissionService {
     private final DailyMissionsRepository dailyMissionsRepository;
     private final ChildrenRepository childrenRepository;
     private final PresetBigTasksRepository presetBigTasksRepository;
+    private final RoutinePresetsRepository routinePresetsRepository;
 
     // 오늘의 미션 목록 조회
     @Transactional(readOnly = true)
@@ -109,5 +111,53 @@ public class MissionService {
     private DailyMissions getMissionOrThrow(Long missionId) {
         return dailyMissionsRepository.findById(missionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
+    }
+
+    /**
+     * [스케줄러 전용] 부모님의 루틴 프리셋을 읽어서 '오늘의 미션'으로 일괄 복사
+     */
+    @Transactional
+    public void generateDailyMissionsFromPresets() {
+        log.info("🚀 [배치 작업 시작] 모든 아이들의 오늘자 미션 생성을 시작합니다.");
+        LocalDate today = LocalDate.now();
+
+        // 1. 우리 서비스에 가입된 모든 아이들을 불러온다.
+        List<Children> allChildren = childrenRepository.findAll();
+
+        for (Children child : allChildren) {
+            Parents parent = child.getParent();
+            if (parent == null) continue; // 호적 없는 아이는 패스!
+
+            // 2. 이 아이의 부모님이 만들어둔 '루틴 프리셋' 목록을 다 가져온다.
+            List<RoutinePresets> parentPresets = routinePresetsRepository.findByParentId(parent.getId());
+
+            for (RoutinePresets preset : parentPresets) {
+                // 3. 프리셋 안에 들어있는 '진짜 할 일(BigTasks)'을 순서대로 꺼낸다.
+                List<PresetBigTasks> bigTasks = presetBigTasksRepository.findByPresetIdOrderByOrderIndex(preset.getId());
+
+                for (PresetBigTasks bigTask : bigTasks) {
+                    // 🚨 중복 생성 방지 로직 (선택이지만 필수급): 이미 오늘 똑같은 미션을 만들어줬는지 확인!
+                    // (TODO: DailyMissionsRepository에 아이ID, 날짜, OriginBigTaskId로 찾는 쿼리 필요시 추가)
+
+                    // 4. 새로운 '오늘의 미션' 객체를 조립!
+                    DailyMissions newMission = DailyMissions.create(
+                            child,
+                            preset.getId(),
+                            bigTask.getId(),
+                            preset.getTitle(),
+                            bigTask.getTitle(),
+                            null, // 태그
+                            20, // 임시 할당 경험치 (추후 난이도 등에 따라 기획 수정 필요!)
+                            today,
+                            bigTask.getStartTime(),
+                            bigTask.getEndTime()
+                    );
+
+                    // 5. DB에 저장!
+                    dailyMissionsRepository.save(newMission);
+                }
+            }
+        }
+        log.info("✅ [배치 작업 완료] 오늘의 미션 복사가 모두 끝났습니다!");
     }
 }
