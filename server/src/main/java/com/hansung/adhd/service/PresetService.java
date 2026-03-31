@@ -1,10 +1,15 @@
 package com.hansung.adhd.service;
 
+import com.hansung.adhd.domain.Children;
+import com.hansung.adhd.domain.DailyMissions;
 import com.hansung.adhd.domain.Parents;
 import com.hansung.adhd.domain.PresetBigTasks;
 import com.hansung.adhd.domain.RoutinePresets;
+import com.hansung.adhd.dto.MissionDto;
 import com.hansung.adhd.dto.PresetDto;
 import com.hansung.adhd.exception.CustomException;
+import com.hansung.adhd.repository.ChildrenRepository;
+import com.hansung.adhd.repository.DailyMissionsRepository;
 import com.hansung.adhd.repository.ParentsRepository;
 import com.hansung.adhd.repository.PresetBigTasksRepository;
 import com.hansung.adhd.repository.PresetSmallTasksRepository;
@@ -14,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,6 +32,8 @@ public class PresetService {
     private final PresetBigTasksRepository presetBigTasksRepository;
     private final PresetSmallTasksRepository presetSmallTasksRepository;
     private final ParentsRepository parentsRepository;
+    private final ChildrenRepository childrenRepository;
+    private final DailyMissionsRepository dailyMissionsRepository;
 
     // 부모의 프리셋 목록 조회
     @Transactional(readOnly = true)
@@ -113,5 +121,56 @@ public class PresetService {
         RoutinePresets preset = routinePresetsRepository.findById(presetId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
         preset.delete();
+    }
+
+    // ── 프리셋 불러오기 ───────────────────────────────────────────────────────
+    // 프리셋에 묶인 BigTask들을 선택한 날짜부터 offset 계산해서 DailyMissions 일괄 생성
+    @Transactional
+    public List<MissionDto.MissionResponse> loadPreset(Long presetId, PresetDto.LoadRequest request) {
+        RoutinePresets preset = routinePresetsRepository.findById(presetId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
+
+        Children child = childrenRepository.findById(request.getChildId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+
+        // 프리셋에 묶인 BigTask 목록 조회 (순서대로)
+        List<PresetBigTasks> bigTasks =
+                presetBigTasksRepository.findByPresetIdOrderByOrderIndex(preset.getId());
+
+        if (bigTasks.isEmpty()) {
+            throw new CustomException(ErrorCode.PRESET_NOT_FOUND);
+        }
+
+        // BigTask들의 원본 날짜 중 가장 빠른 날짜를 기준일로 잡음
+        // (프리셋 저장 시 BigTask들이 특정 날짜 기반으로 만들어진 경우)
+        // 현재는 BigTask에 날짜 정보가 없으므로 순서(orderIndex)를 날짜 offset으로 사용
+        LocalDate startDate = request.getStartDate();
+
+        List<DailyMissions> missions = bigTasks.stream()
+                .map(bigTask -> {
+                    // orderIndex를 dayOffset으로 활용 (0부터 시작)
+                    int dayOffset = bigTask.getOrderIndex() != null ? bigTask.getOrderIndex() : 0;
+                    LocalDate missionDate = startDate.plusDays(dayOffset);
+
+                    return DailyMissions.create(
+                            child,
+                            preset.getId(),
+                            bigTask.getId(),
+                            preset.getTitle(),
+                            bigTask.getTitle(),
+                            null,
+                            request.getAssignedExpPerMission(),
+                            missionDate,
+                            bigTask.getStartTime(),
+                            bigTask.getEndTime()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        dailyMissionsRepository.saveAll(missions);
+
+        return missions.stream()
+                .map(MissionDto.MissionResponse::from)
+                .collect(Collectors.toList());
     }
 }

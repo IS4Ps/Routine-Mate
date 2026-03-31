@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class PresetDto {
@@ -22,7 +23,7 @@ public class PresetDto {
         private String      description;
         private String      icon;
         private Integer     durationDays;
-        private List<Long>  bigTaskIds; // 묶을 BigTask ID 목록
+        private List<Long>  bigTaskIds;
     }
 
     /** 프리셋 수정 요청 */
@@ -34,6 +35,20 @@ public class PresetDto {
         private String  description;
         private String  icon;
         private Integer durationDays;
+    }
+
+    /** 프리셋 불러오기 요청 */
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LoadRequest {
+        private Long      childId;
+        private LocalDate startDate;           // 불러올 시작 날짜
+        private Integer   assignedExpPerMission; // 미션당 경험치 (없으면 기본값 20)
+
+        public Integer getAssignedExpPerMission() {
+            return assignedExpPerMission != null ? assignedExpPerMission : 20;
+        }
     }
 
     /** 프리셋 목록 응답 */

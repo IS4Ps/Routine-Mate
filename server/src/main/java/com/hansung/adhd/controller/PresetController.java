@@ -1,5 +1,6 @@
 package com.hansung.adhd.controller;
 
+import com.hansung.adhd.dto.MissionDto;
 import com.hansung.adhd.dto.PresetDto;
 import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.PresetService;
@@ -54,5 +55,14 @@ public class PresetController {
             @PathVariable Long presetId) {
         presetService.deletePreset(presetId);
         return ResponseEntity.ok(ApiResponse.noContent());
+    }
+
+    @Operation(summary = "프리셋 불러오기",
+               description = "프리셋의 BigTask들을 선택한 날짜부터 DailyMissions로 일괄 생성합니다.")
+    @PostMapping("/{presetId}/load")
+    public ResponseEntity<ApiResponse<List<MissionDto.MissionResponse>>> loadPreset(
+            @PathVariable Long presetId,
+            @RequestBody PresetDto.LoadRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(presetService.loadPreset(presetId, request)));
     }
 }
