@@ -30,6 +30,21 @@ public class MoodLogs extends BaseEntity {
 
     private Integer score;
 
+    public static MoodLogs create(Children child, LocalDate date,
+                                  String primaryEmotion, String secondaryEmotion, Integer score) {
+        MoodLogs log = new MoodLogs();
+        log.child = child;
+        log.date = date;
+        log.primaryEmotion = primaryEmotion;
+        log.secondaryEmotion = secondaryEmotion;
+        log.score = score;
+        return log;
+    }
 
+    public void record(String primaryEmotion, String secondaryEmotion, Integer score) {
+        this.primaryEmotion = primaryEmotion;
+        this.secondaryEmotion = secondaryEmotion;
+        this.score = score;
+    }
 
 }

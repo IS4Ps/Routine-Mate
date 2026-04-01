@@ -31,6 +31,17 @@ public class OfflineRewards extends BaseEntity {
     @Column(length = 20)
     private String status;
 
+    public static OfflineRewards create(Children child, String periodType,
+                                        Integer targetPercent, String rewardPromiseText) {
+        OfflineRewards reward = new OfflineRewards();
+        reward.child = child;
+        reward.periodType = periodType;
+        reward.targetPercent = targetPercent;
+        reward.rewardPromiseText = rewardPromiseText;
+        reward.status = "PENDING";
+        return reward;
+    }
 
+    public void complete() { this.status = "COMPLETED"; }
 
 }

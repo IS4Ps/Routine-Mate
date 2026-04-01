@@ -27,4 +27,14 @@ public class MinigameLogs extends BaseEntity {
     @Column(name = "reward_amount")
     private Integer rewardAmount;
 
+    public static MinigameLogs create(Children child, String gameType,
+                                      Integer score, Integer rewardAmount) {
+        MinigameLogs log = new MinigameLogs();
+        log.child = child;
+        log.gameType = gameType;
+        log.score = score;
+        log.rewardAmount = rewardAmount;
+        return log;
+    }
+
 }
