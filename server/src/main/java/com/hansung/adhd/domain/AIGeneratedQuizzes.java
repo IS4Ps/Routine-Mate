@@ -25,11 +25,8 @@ public class AIGeneratedQuizzes extends BaseEntity {
     @Column(name = "question_text", columnDefinition = "TEXT")
     private String questionText;
 
-    @Column(name = "option_json", columnDefinition = "JSON")
-    private String optionJson;
-
     @Column(name = "correct_answer", length = 255)
-    private String correctAnswer;
+    private String correctAnswer;  // "O" or "X"
 
     @Column(columnDefinition = "TEXT")
     private String explanation;
@@ -43,4 +40,24 @@ public class AIGeneratedQuizzes extends BaseEntity {
     @Column(name = "is_correct")
     private Boolean isCorrect;
 
+    // ── 정적 팩토리 ──────────────────────────────────────────────────────────
+    public static AIGeneratedQuizzes create(Children child, String category,
+                                            String questionText, String correctAnswer,
+                                            String explanation) {
+        AIGeneratedQuizzes quiz = new AIGeneratedQuizzes();
+        quiz.child = child;
+        quiz.category = category;
+        quiz.questionText = questionText;
+        quiz.correctAnswer = correctAnswer;
+        quiz.explanation = explanation;
+        quiz.isSolved = false;
+        return quiz;
+    }
+
+    // ── 정답 제출 ─────────────────────────────────────────────────────────────
+    public void submitAnswer(String childAnswer) {
+        this.childAnswer = childAnswer;
+        this.isCorrect = this.correctAnswer.equalsIgnoreCase(childAnswer);
+        this.isSolved = true;
+    }
 }
