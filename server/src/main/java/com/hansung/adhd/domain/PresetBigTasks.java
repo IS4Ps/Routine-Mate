@@ -15,7 +15,6 @@ public class PresetBigTasks extends BaseEntity {
     @Column(name = "big_task_id")
     private Long id;
 
-    // 프리셋에 묶이기 전엔 null, 나중에 프리셋에 묶으면 값이 생김
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "preset_id", nullable = true)
     private RoutinePresets preset;
@@ -39,9 +38,12 @@ public class PresetBigTasks extends BaseEntity {
     @Column(name = "end_time", length = 10)
     private String endTime;
 
-    // ── 정적 팩토리 (프리셋 없이 생성) ───────────────────────────────────────
+    @Column(length = 255)
+    private String tags;
+
     public static PresetBigTasks create(Parents parent, String title, String icon,
-                                        Integer orderIndex, String startTime, String endTime) {
+                                        Integer orderIndex, String startTime,
+                                        String endTime, String tags) {
         PresetBigTasks bigTask = new PresetBigTasks();
         bigTask.parent     = parent;
         bigTask.title      = title;
@@ -49,21 +51,21 @@ public class PresetBigTasks extends BaseEntity {
         bigTask.orderIndex = orderIndex;
         bigTask.startTime  = startTime;
         bigTask.endTime    = endTime;
+        bigTask.tags       = tags;
         return bigTask;
     }
 
-    // ── 프리셋에 묶기 ─────────────────────────────────────────────────────────
     public void assignToPreset(RoutinePresets preset) {
         this.preset = preset;
     }
 
-    // ── 수정 ─────────────────────────────────────────────────────────────────
     public void update(String title, String icon, Integer orderIndex,
-                       String startTime, String endTime) {
+                       String startTime, String endTime, String tags) {
         this.title      = title;
         this.icon       = icon;
         this.orderIndex = orderIndex;
         this.startTime  = startTime;
         this.endTime    = endTime;
+        this.tags       = tags;
     }
 }

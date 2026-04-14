@@ -11,7 +11,6 @@ import java.util.List;
 
 public class BigTaskDto {
 
-    /** BigTask 생성 요청 */
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -22,10 +21,10 @@ public class BigTaskDto {
         private Integer orderIndex;
         private String  startTime;
         private String  endTime;
+        private String  tags;
         private List<SmallTaskCreateRequest> smallTasks;
     }
 
-    /** SmallTask 생성 요청 */
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -36,7 +35,6 @@ public class BigTaskDto {
         private Integer orderIndex;
     }
 
-    /** BigTask 수정 요청 */
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -46,9 +44,9 @@ public class BigTaskDto {
         private Integer orderIndex;
         private String  startTime;
         private String  endTime;
+        private String  tags;
     }
 
-    /** SmallTask 응답 */
     @Getter
     @Builder
     public static class SmallTaskResponse {
@@ -69,7 +67,6 @@ public class BigTaskDto {
         }
     }
 
-    /** BigTask 응답 (SmallTask 포함) */
     @Getter
     @Builder
     public static class BigTaskResponse {
@@ -79,7 +76,8 @@ public class BigTaskDto {
         private Integer orderIndex;
         private String  startTime;
         private String  endTime;
-        private Long    presetId; // null이면 프리셋에 안 묶인 상태
+        private String  tags;
+        private Long    presetId;
         private List<SmallTaskResponse> smallTasks;
 
         public static BigTaskResponse from(PresetBigTasks bigTask, List<SmallTaskResponse> smallTasks) {
@@ -90,6 +88,7 @@ public class BigTaskDto {
                     .orderIndex(bigTask.getOrderIndex())
                     .startTime(bigTask.getStartTime())
                     .endTime(bigTask.getEndTime())
+                    .tags(bigTask.getTags())
                     .presetId(bigTask.getPreset() != null ? bigTask.getPreset().getId() : null)
                     .smallTasks(smallTasks)
                     .build();

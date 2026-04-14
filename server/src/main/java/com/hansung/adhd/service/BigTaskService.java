@@ -65,11 +65,11 @@ public class BigTaskService {
                 request.getIcon(),
                 request.getOrderIndex(),
                 request.getStartTime(),
-                request.getEndTime()
+                request.getEndTime(),
+                request.getTags()
         );
         presetBigTasksRepository.save(bigTask);
 
-        // SmallTask 생성
         List<PresetSmallTasks> smallTasks = List.of();
         if (request.getSmallTasks() != null) {
             smallTasks = request.getSmallTasks().stream()
@@ -97,8 +97,8 @@ public class BigTaskService {
         PresetBigTasks bigTask = presetBigTasksRepository.findById(bigTaskId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BIG_TASK_NOT_FOUND));
 
-        bigTask.update(request.getTitle(), request.getIcon(),
-                request.getOrderIndex(), request.getStartTime(), request.getEndTime());
+        bigTask.update(request.getTitle(), request.getIcon(), request.getOrderIndex(),
+                request.getStartTime(), request.getEndTime(), request.getTags());
 
         List<BigTaskDto.SmallTaskResponse> smallTaskResponses =
                 presetSmallTasksRepository.findByBigTaskIdOrderByOrderIndex(bigTaskId)
