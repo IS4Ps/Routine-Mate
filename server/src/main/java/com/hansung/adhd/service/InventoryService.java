@@ -23,11 +23,21 @@ public class InventoryService {
     private final ItemsRepository itemsRepository;
     private final ChildrenRepository childrenRepository;
 
-    // 인벤토리 조회
+    // 인벤토리 전체 조회
     @Transactional(readOnly = true)
     public List<InventoryDto.InventoryResponse> getInventory(Long childId) {
         return inventoryRepository.findByChildId(childId)
                 .stream()
+                .map(InventoryDto.InventoryResponse::from)
+                .toList();
+    }
+
+    // 현재 장착 아이템만 조회 (앱 시작 시 캐릭터 외형 복원용)
+    @Transactional(readOnly = true)
+    public List<InventoryDto.InventoryResponse> getEquippedItems(Long childId) {
+        return inventoryRepository.findByChildId(childId)
+                .stream()
+                .filter(inv -> Boolean.TRUE.equals(inv.getIsEquipped()))
                 .map(InventoryDto.InventoryResponse::from)
                 .toList();
     }
@@ -56,11 +66,8 @@ public class InventoryService {
             throw new CustomException(ErrorCode.JOB_NOT_MATCHED);
         }
 
-        // ⭐️ [NEW]
-        if (child.getGold() < item.getPrice()) {
-            throw new CustomException(ErrorCode.INSUFFICIENT_GOLD);
-        }
-        child.useGold(item.getPrice()); // 골드 차감
+        // 골드 차감
+        child.useGold(item.getPrice());
 
         Inventory inventory = Inventory.create(child, item);
         inventoryRepository.save(inventory);
@@ -69,7 +76,7 @@ public class InventoryService {
                 .inventoryId(inventory.getId())
                 .itemId(item.getId())
                 .itemName(item.getName())
-                .remainingGold(child.getGold()) // ⭐️ [NEW] 아이의 '진짜 남은 골드' 반환!
+                .remainingGold(child.getGold())
                 .build();
     }
 

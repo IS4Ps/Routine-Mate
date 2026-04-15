@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 public class MoodDto {
 
@@ -39,5 +40,16 @@ public class MoodDto {
                     .score(log.getScore())
                     .build();
         }
+    }
+
+    /** 월간 감정 캘린더 응답 */
+    @Getter
+    @Builder
+    public static class MonthlyMoodResponse {
+        private Integer year;
+        private Integer month;
+        private Integer totalCount;   // 해당 월 기록 수
+        private Double  avgScore;     // 해당 월 평균 감정 점수
+        private Map<String, MoodResponse> moodMap; // "2026-04-05" → MoodResponse
     }
 }

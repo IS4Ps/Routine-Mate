@@ -26,16 +26,23 @@ public class InventoryController {
         return ResponseEntity.ok(ApiResponse.ok(inventoryService.getInventory(childId)));
     }
 
+    @Operation(summary = "현재 장착 아이템 조회",
+            description = "현재 장착 중인 아이템 목록을 조회합니다. 앱 시작 시 캐릭터 외형 복원에 사용합니다.")
+    @GetMapping("/{childId}/equipped")
+    public ResponseEntity<ApiResponse<List<InventoryDto.InventoryResponse>>> getEquippedItems(
+            @PathVariable Long childId) {
+        return ResponseEntity.ok(ApiResponse.ok(inventoryService.getEquippedItems(childId)));
+    }
+
     @Operation(summary = "아이템 구매", description = "상점에서 아이템을 구매합니다.")
     @PostMapping("/{itemId}/purchase")
     public ResponseEntity<ApiResponse<InventoryDto.PurchaseResponse>> purchaseItem(
             @PathVariable Long itemId,
             @RequestParam Long childId) {
-        return ResponseEntity.ok(ApiResponse.ok(
-                inventoryService.purchaseItem(itemId, childId)));
+        return ResponseEntity.ok(ApiResponse.ok(inventoryService.purchaseItem(itemId, childId)));
     }
 
-    @Operation(summary = "아이템 장착/해제", description = "아이템을 장착하거나 해제합니다. 같은 타입은 자동으로 교체됩니다.")
+    @Operation(summary = "아이템 장착/해제", description = "아이템을 장착하거나 해제합니다. 같은 부위는 자동으로 교체됩니다.")
     @PatchMapping("/{inventoryId}/equip")
     public ResponseEntity<ApiResponse<InventoryDto.EquipResponse>> equipItem(
             @PathVariable Long inventoryId) {
