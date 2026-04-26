@@ -41,6 +41,11 @@ public class SecurityConfig {
                         .requestMatchers("/auth/child/login").permitAll()
                         // ⭐️ /children 주소로 들어오는 요청은 무조건 인증(토큰)이 필요하다고 못 박음!
                         .requestMatchers("/children/**").authenticated()
+                        // 이 아래는 연동하면서 토큰 발급 안 받기 위함
+                        .requestMatchers("/children/**").permitAll()
+                        .requestMatchers("/parents/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()
+
                         // 그 외의 모든 찔러보기(API 요청)는 무조건 인증(토큰)을 거쳐야 함
                         .anyRequest().authenticated()
                 )
