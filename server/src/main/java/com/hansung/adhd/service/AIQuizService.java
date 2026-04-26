@@ -9,6 +9,7 @@ import com.hansung.adhd.exception.CustomException;
 import com.hansung.adhd.repository.AIQuizRepository;
 import com.hansung.adhd.repository.ChildrenRepository;
 import com.hansung.adhd.response.ErrorCode;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,8 @@ public class AIQuizService {
     private final ChildrenRepository childrenRepository;
     private final ObjectMapper objectMapper;
 
-    @Value("${openai.api-key}")
+
+    @Value("${OPENAI_API_KEY}")
     private String openaiApiKey;
 
     private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
@@ -159,12 +161,20 @@ public class AIQuizService {
             Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
             String content = (String) message.get("content");
 
+
+            log.info("AI 응답 내용: {}", content); // 방금 로그 확인하려 추가
             // JSON 파싱
             return objectMapper.readValue(content, new TypeReference<List<Map<String, String>>>() {});
 
         } catch (Exception e) {
             log.error("OpenAI API 호출 실패: {}", e.getMessage());
+            headers.setBearerAuth(openaiApiKey);
+            if (e instanceof org.springframework.web.client.HttpClientErrorException) {
+                org.springframework.web.client.HttpClientErrorException httpEx =
+                        (org.springframework.web.client.HttpClientErrorException) e;
+            }
             throw new CustomException(ErrorCode.AI_QUIZ_GENERATION_FAILED);
+
         }
     }
 }

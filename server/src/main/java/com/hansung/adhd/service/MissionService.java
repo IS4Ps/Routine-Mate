@@ -13,9 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,6 +31,9 @@ public class MissionService {
     private final PresetBigTasksRepository presetBigTasksRepository;
     private final RoutinePresetsRepository routinePresetsRepository;
 
+    private static final double SUCCESS_THRESHOLD = 70.0; // 일별 성공 기준 달성률
+    private static final int REWARD_THRESHOLD = 5;        // 주간 보상 기준 성공 일수
+
     // 오늘의 미션 목록 조회
     @Transactional(readOnly = true)
     public List<MissionDto.MissionResponse> getTodayMissions(Long childId) {
@@ -37,7 +43,7 @@ public class MissionService {
                 .collect(Collectors.toList());
     }
 
-    // 미션 생성 (BigTask 선택 → tags 자동 복사)
+    // 미션 생성
     @Transactional
     public MissionDto.MissionResponse createMission(MissionDto.CreateRequest request) {
         Children child = childrenRepository.findById(request.getChildId())
@@ -52,7 +58,7 @@ public class MissionService {
                 bigTask.getId(),
                 bigTask.getPreset() != null ? bigTask.getPreset().getTitle() : null,
                 bigTask.getTitle(),
-                bigTask.getTags(),  // BigTask의 tags 자동 복사
+                bigTask.getTags(),
                 request.getAssignedExp(),
                 request.getDate(),
                 request.getStartTime(),
@@ -109,26 +115,63 @@ public class MissionService {
         mission.delete();
     }
 
-    // 주간 통계
+    // ── 주간 성공률 통계 ─────────────────────────────────────────────────────
     @Transactional(readOnly = true)
-    public MissionDto.StatisticsResponse getWeeklyStatistics(Long childId) {
+    public MissionDto.WeeklyStatsResponse getWeeklyStats(Long childId) {
         LocalDate today = LocalDate.now();
-        LocalDate startOfWeek = today.minusDays(7);
 
+        // 이번 주 월요일 ~ 일요일 계산
+        LocalDate monday = today.with(DayOfWeek.MONDAY);
+        LocalDate sunday = today.with(DayOfWeek.SUNDAY);
+
+        // 이번 주 전체 미션 조회
         List<DailyMissions> weeklyMissions =
-                dailyMissionsRepository.findByChildIdAndDateBetween(childId, startOfWeek, today);
+                dailyMissionsRepository.findByChildIdAndDateBetween(childId, monday, sunday);
 
-        int total = weeklyMissions.size();
-        int completed = (int) weeklyMissions.stream()
-                .filter(m -> "COMPLETED".equals(m.getStatus()) || "APPROVED".equals(m.getStatus()))
-                .count();
+        // 날짜별로 그룹핑
+        Map<LocalDate, List<DailyMissions>> missionsByDate = weeklyMissions.stream()
+                .collect(Collectors.groupingBy(DailyMissions::getDate));
 
-        double rate = (total == 0) ? 0.0 : Math.round(((double) completed / total) * 1000) / 10.0;
+        // 일별 달성 현황 계산
+        List<MissionDto.DailyAchievement> dailyList = new ArrayList<>();
+        int successDays = 0;
+        double totalRate = 0.0;
 
-        return MissionDto.StatisticsResponse.builder()
-                .totalMissions(total)
-                .completedMissions(completed)
-                .completionRate(rate)
+        for (LocalDate date = monday; !date.isAfter(sunday); date = date.plusDays(1)) {
+            List<DailyMissions> dayMissions = missionsByDate.getOrDefault(date, List.of());
+
+            int total = dayMissions.size();
+            int completed = (int) dayMissions.stream()
+                    .filter(m -> "COMPLETED".equals(m.getStatus()) || "APPROVED".equals(m.getStatus()))
+                    .count();
+
+            double rate = (total == 0) ? 0.0 : Math.round(((double) completed / total) * 1000) / 10.0;
+            boolean isSuccess = total > 0 && rate >= SUCCESS_THRESHOLD;
+
+            if (isSuccess) successDays++;
+            totalRate += rate;
+
+            dailyList.add(MissionDto.DailyAchievement.builder()
+                    .date(date)
+                    .totalCount(total)
+                    .completedCount(completed)
+                    .completionRate(rate)
+                    .isSuccess(isSuccess)
+                    .build());
+        }
+
+        double avgRate = Math.round((totalRate / 7) * 10) / 10.0;
+        double weeklySuccessRate = Math.round(((double) successDays / 7) * 1000) / 10.0;
+
+        return MissionDto.WeeklyStatsResponse.builder()
+                .startDate(monday)
+                .endDate(sunday)
+                .successDays(successDays)
+                .totalDays(7)
+                .weeklySuccessRate(weeklySuccessRate)
+                .avgCompletionRate(avgRate)
+                .isRewardEligible(successDays >= REWARD_THRESHOLD)
+                .dailyList(dailyList)
                 .build();
     }
 
@@ -152,16 +195,10 @@ public class MissionService {
 
                 for (PresetBigTasks bigTask : bigTasks) {
                     DailyMissions newMission = DailyMissions.create(
-                            child,
-                            preset.getId(),
-                            bigTask.getId(),
-                            preset.getTitle(),
-                            bigTask.getTitle(),
-                            bigTask.getTags(),  // tags 자동 복사
-                            20,
-                            today,
-                            bigTask.getStartTime(),
-                            bigTask.getEndTime()
+                            child, preset.getId(), bigTask.getId(),
+                            preset.getTitle(), bigTask.getTitle(),
+                            bigTask.getTags(), 20, today,
+                            bigTask.getStartTime(), bigTask.getEndTime()
                     );
                     dailyMissionsRepository.save(newMission);
                 }

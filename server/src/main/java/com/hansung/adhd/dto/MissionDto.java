@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class MissionDto {
 
@@ -20,8 +21,8 @@ public class MissionDto {
         private Long      originBigTaskId;
         private Integer   assignedExp;
         private LocalDate date;
-        private String    startTime; // "08:30"
-        private String    endTime;   // "09:30"
+        private String    startTime;
+        private String    endTime;
     }
 
     /** 미션 승인/거절 요청 */
@@ -29,7 +30,7 @@ public class MissionDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReviewRequest {
-        private String status;       // APPROVED or REJECTED
+        private String status;
         private String rejectReason;
     }
 
@@ -70,12 +71,37 @@ public class MissionDto {
         }
     }
 
-    /** 부모님 대시보드용 통계 응답 */
+    /** 일별 달성 현황 */
+    @Getter
+    @Builder
+    public static class DailyAchievement {
+        private LocalDate date;
+        private Integer   totalCount;      // 오늘 전체 미션 수
+        private Integer   completedCount;  // 완료한 미션 수
+        private Double    completionRate;  // 달성률 (%)
+        private Boolean   isSuccess;       // 70% 이상이면 오늘 성공
+    }
+
+    /** 주간 성공률 응답 */
+    @Getter
+    @Builder
+    public static class WeeklyStatsResponse {
+        private LocalDate startDate;         // 주 시작일 (월요일)
+        private LocalDate endDate;           // 주 종료일 (일요일)
+        private Integer   successDays;       // 성공한 날 수
+        private Integer   totalDays;         // 전체 일수 (7)
+        private Double    weeklySuccessRate; // 주간 성공률 (successDays/7 * 100)
+        private Double    avgCompletionRate; // 평균 달성률
+        private Boolean   isRewardEligible;  // 보상 지급 대상 여부 (5일 이상 성공)
+        private List<DailyAchievement> dailyList; // 일별 상세 현황
+    }
+
+    /** 기존 통계 응답 (하위 호환용) */
     @Getter
     @Builder
     public static class StatisticsResponse {
-        private Integer totalMissions;     // 이번 주 총 미션 개수
-        private Integer completedMissions; // 완료한 미션 개수
-        private Double completionRate;     // 달성률 (백분율 %)
+        private Integer totalMissions;
+        private Integer completedMissions;
+        private Double  completionRate;
     }
 }

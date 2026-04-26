@@ -47,8 +47,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         refreshTokenRepository.save(new RefreshToken(refreshToken, parent.getEmail()));
 
         // 6. 프론트엔드(React/Flutter)의 특정 주소로 토큰을 들고 리다이렉트(이동) 시킨다!
-        String targetUrl = "http://localhost:3000/oauth2/redirect?accessToken=" + accessToken + "&refreshToken=" + refreshToken;
-
+//        String targetUrl = "http://localhost:3000/oauth2/redirect?accessToken=" + accessToken + "&refreshToken=" + refreshToken;
+        String targetUrl = "routinemate://oauth2/redirect?accessToken=" + accessToken
+                + "&refreshToken=" + refreshToken;
         log.info("OAuth2 로그인 성공! 진짜 JWT 발급 & DB 저장 완료. 프론트엔드로 리다이렉트 합니다. email: {}", email);
 
         // 7. 손님, 프론트엔드로 돌아가십쇼!
