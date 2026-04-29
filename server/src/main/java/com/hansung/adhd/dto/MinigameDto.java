@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.util.List;
+
 public class MinigameDto {
 
     @Getter
@@ -34,5 +36,194 @@ public class MinigameDto {
                     .rewardAmount(log.getRewardAmount())
                     .build();
         }
+    }
+
+    // ── Go/No-Go ─────────────────────────────────────────────────────────────
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GoNoGoStartRequest {
+        private Long    childId;
+        private Integer totalCount;
+        private Integer difficulty;
+
+        public Integer getTotalCount() { return totalCount != null ? totalCount : 20; }
+        public Integer getDifficulty() { return difficulty != null ? difficulty : 1; }
+    }
+
+    @Getter
+    @Builder
+    public static class Stimulus {
+        private Integer index;
+        private String  type;
+        private String  image;
+    }
+
+    @Getter
+    @Builder
+    public static class GoNoGoStartResponse {
+        private String         sessionId;
+        private List<Stimulus> stimuli;
+        private Integer        timeLimit;
+        private Integer        totalCount;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Answer {
+        private Integer index;
+        private Boolean tapped;
+        private Integer responseTime;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GoNoGoSubmitRequest {
+        private Long         childId;
+        private String       sessionId;
+        private List<Answer> answers;
+    }
+
+    @Getter
+    @Builder
+    public static class GoNoGoSubmitResponse {
+        private Integer correctCount;
+        private Integer wrongCount;
+        private Integer totalCount;
+        private Double  accuracy;
+        private Double  avgResponseTime;
+        private Integer score;
+        private Integer rewardGold;
+        private Integer statStrengthGain;
+    }
+
+    // ── 스트룹 ────────────────────────────────────────────────────────────────
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StroopStartRequest {
+        private Long    childId;
+        private Integer totalCount;
+        private Integer difficulty;
+
+        public Integer getTotalCount() { return totalCount != null ? totalCount : 20; }
+        public Integer getDifficulty() { return difficulty != null ? difficulty : 1; }
+    }
+
+    @Getter
+    @Builder
+    public static class StroopStimulus {
+        private Integer index;
+        private String  word;
+        private String  inkColor;
+        private Boolean isMatch;
+    }
+
+    @Getter
+    @Builder
+    public static class StroopStartResponse {
+        private String               sessionId;
+        private List<StroopStimulus> stimuli;
+        private Integer              timeLimit;
+        private Integer              totalCount;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StroopAnswer {
+        private Integer index;
+        private String  selectedColor;
+        private Integer responseTime;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StroopSubmitRequest {
+        private Long               childId;
+        private String             sessionId;
+        private List<StroopAnswer> answers;
+    }
+
+    @Getter
+    @Builder
+    public static class StroopSubmitResponse {
+        private Integer correctCount;
+        private Integer wrongCount;
+        private Integer totalCount;
+        private Double  accuracy;
+        private Double  avgResponseTime;
+        private Integer score;
+        private Integer rewardGold;
+        private Integer statCreativityGain;
+    }
+
+    // ── N-Back ────────────────────────────────────────────────────────────────
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NBackStartRequest {
+        private Long    childId;
+        private Integer nLevel;      // N 값 (기본 2 → 2-Back)
+        private Integer totalCount;  // 자극 수 (기본 20개)
+
+        public Integer getNLevel()     { return nLevel != null ? nLevel : 2; }
+        public Integer getTotalCount() { return totalCount != null ? totalCount : 20; }
+    }
+
+    /** N-Back 자극 하나 */
+    @Getter
+    @Builder
+    public static class NBackStimulus {
+        private Integer index;
+        private String  value;   // 자극값 (예: 사과, 바나나 등 이미지 키)
+    }
+
+    @Getter
+    @Builder
+    public static class NBackStartResponse {
+        private String              sessionId;
+        private Integer             nLevel;       // Flutter가 N값 알아야 함
+        private List<NBackStimulus> stimuli;
+        private Integer             displayTime;  // 자극 표시 시간 (ms)
+        private Integer             intervalTime; // 자극 간 간격 (ms)
+        private Integer             totalCount;
+    }
+
+    /** N-Back 아이 답변 */
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NBackAnswer {
+        private Integer index;
+        private Boolean matched; // N번 전과 같다고 판단했는지
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NBackSubmitRequest {
+        private Long              childId;
+        private String            sessionId;
+        private List<NBackAnswer> answers;
+    }
+
+    @Getter
+    @Builder
+    public static class NBackSubmitResponse {
+        private Integer correctCount;
+        private Integer wrongCount;
+        private Integer totalCount;
+        private Double  accuracy;
+        private Integer score;
+        private Integer rewardGold;
+        private Integer statIntelligenceGain;
+        private Integer nLevel;
     }
 }

@@ -86,6 +86,18 @@ public class Children extends BaseEntity {
             // 레벨업 했으니, '다음 레벨업'에 필요한 경험치 기준으로 갱신
             requiredExp = this.level * 100;
         }
+
+    }
+    public void gainStatStrength(Integer amount) {
+        this.statStrength += amount;
+    }
+
+    public void gainStatIntelligence(Integer amount) {
+        this.statIntelligence += amount;
+    }
+
+    public void gainStatCreativity(Integer amount) {
+        this.statCreativity += amount;
     }
 
     public void updateNickname(String newNickname) {
