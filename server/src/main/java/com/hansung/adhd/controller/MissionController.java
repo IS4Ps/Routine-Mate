@@ -3,6 +3,8 @@ package com.hansung.adhd.controller;
 import com.hansung.adhd.dto.MissionDto;
 import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.MissionService;
+import com.hansung.adhd.dto.AiRoutineDto;
+import com.hansung.adhd.service.AiRoutineService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.List;
 public class MissionController {
 
     private final MissionService missionService;
+    private final AiRoutineService aiRoutineService;
 
     @Operation(summary = "오늘의 미션 목록 조회")
     @GetMapping("/today/{childId}")
@@ -69,5 +72,21 @@ public class MissionController {
             @PathVariable Long missionId) {
         missionService.deleteMission(missionId);
         return ResponseEntity.ok(ApiResponse.noContent());
+    }
+
+    @Operation(summary = "AI 루틴 추천 및 자동 생성",
+            description = "AI가 아이의 스탯을 분석해 맞춤형 미션을 추천하고, 즉시 오늘의 미션으로 자동 생성합니다.")
+    @PostMapping("/ai-recommend/{childId}")
+    public ResponseEntity<ApiResponse<List<MissionDto.MissionResponse>>> recommendAndCreateMissions(
+            @PathVariable Long childId) {
+
+        // 1. AI 코치한테 아이 스탯 주면서 추천받아오기!
+        AiRoutineDto.Response aiResponse = aiRoutineService.recommendRoutines(new AiRoutineDto.Request(childId));
+
+        // 2. 추천받은 내용을 바탕으로 실제 DailyMission 생성해서 DB에 저장!
+        List<MissionDto.MissionResponse> savedMissions =
+                missionService.createMissionsFromAi(childId, aiResponse.getRecommendedRoutines());
+
+        return ResponseEntity.ok(ApiResponse.ok("AI 추천 미션이 성공적으로 생성되었습니다.", savedMissions));
     }
 }

@@ -4,7 +4,7 @@ spring:
 
   # 1. MySQL 연결 설정 (AWS EC2)
   datasource:
-    url: jdbc:mysql://100.27.204.252:3306/capstone?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: ${DB_URL}
     username: root
     password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
