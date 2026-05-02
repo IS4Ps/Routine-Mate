@@ -1,6 +1,8 @@
 package com.hansung.adhd.domain;
 import com.hansung.adhd.entity.BaseEntity;
 
+import com.hansung.adhd.exception.CustomException;
+import com.hansung.adhd.response.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -59,8 +61,7 @@ public class Children extends BaseEntity {
     public void useGold(Integer amount) {
         // 골드가 모자란데 아이템을 사려고 하면 에러를 던져서 막기
         if (this.gold < amount) {
-            // TODO: A 머지 후 자네 팀이 만들어둔 CustomException(ErrorCode.INSUFFICIENT_GOLD) 로 교체하게나!
-            throw new IllegalArgumentException("골드가 부족합니다.");
+            throw new CustomException(ErrorCode.INSUFFICIENT_GOLD);
         }
         this.gold -= amount;
     }

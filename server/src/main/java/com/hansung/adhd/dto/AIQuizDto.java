@@ -10,19 +10,25 @@ import java.util.List;
 
 public class AIQuizDto {
 
+    /** 이미지 하나 */
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ImageRequest {
+        private String imageBase64;
+    }
+
     /** 퀴즈 생성 요청 */
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class GenerateRequest {
-        private Long   childId;
-        private String category;   // 예: "수학", "국어", "과학"
-        private String imageBase64; // 학습지 이미지 Base64
-        private Integer quizCount; // 생성할 퀴즈 수 (기본 5개)
+        private Long               childId;
+        private String             category;    // 예: "수학", "과학"
+        private List<ImageRequest> images;      // 여러 장
 
-        public Integer getQuizCount() {
-            return quizCount != null ? quizCount : 5;
-        }
+        // 하위 호환 - 1장짜리 기존 방식도 지원
+        private String imageBase64;
     }
 
     /** 정답 제출 요청 */
@@ -43,7 +49,7 @@ public class AIQuizDto {
         private Boolean isSolved;
         private String  childAnswer;
         private Boolean isCorrect;
-        private String  explanation; // 정답 제출 후에만 반환
+        private String  explanation;
 
         public static QuizResponse from(AIGeneratedQuizzes quiz) {
             return QuizResponse.builder()
@@ -53,13 +59,12 @@ public class AIQuizDto {
                     .isSolved(quiz.getIsSolved())
                     .childAnswer(quiz.getChildAnswer())
                     .isCorrect(quiz.getIsCorrect())
-                    // 풀었을 때만 해설 반환
                     .explanation(quiz.getIsSolved() ? quiz.getExplanation() : null)
                     .build();
         }
     }
 
-    /** 퀴즈 결과 응답 (정답 제출 후) */
+    /** 퀴즈 결과 응답 */
     @Getter
     @Builder
     public static class AnswerResponse {
@@ -67,7 +72,7 @@ public class AIQuizDto {
         private Boolean isCorrect;
         private String  correctAnswer;
         private String  explanation;
-        private Integer rewardGold; // 정답 시 골드 지급
+        private Integer rewardGold;
     }
 
     /** 생성된 퀴즈 목록 응답 */
