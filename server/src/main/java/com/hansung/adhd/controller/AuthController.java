@@ -1,7 +1,8 @@
 package com.hansung.adhd.controller;
 
 import com.hansung.adhd.dto.request.ChildLoginRequestDto;
-import com.hansung.adhd.dto.request.GoogleLoginRequestDto; // ⭐️ 프론트가 줄 구글 토큰 바구니!
+import com.hansung.adhd.dto.request.GoogleLoginRequestDto;
+import com.hansung.adhd.dto.request.KakaoLoginRequestDto;
 import com.hansung.adhd.dto.response.TokenResponseDto;
 import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.AuthService;
@@ -36,13 +37,25 @@ public class AuthController {
     }
 
     /**
-     * ⭐️ [NEW] 부모님 모바일 네이티브 구글 로그인 API
+     * 부모님 모바일 네이티브 구글 로그인 API
      * [POST] /auth/google
      */
     @PostMapping("/google")
     public ApiResponse<TokenResponseDto> googleLogin(@RequestBody GoogleLoginRequestDto requestDto) {
         // 1. 프론트가 폰에서 뽑아온 구글 토큰을 매니저에게 토스!
         TokenResponseDto tokenResponse = authService.googleLogin(requestDto.getIdToken());
+        // 2. 발급받은 우리 서버 출입증 세트(Access/Refresh)를 예쁘게 포장해서 리턴!
+        return ApiResponse.ok(tokenResponse);
+    }
+
+    /**
+     * ⭐️ [NEW] 부모님 모바일 네이티브 카카오 로그인 API
+     * [POST] /auth/kakao
+     */
+    @PostMapping("/kakao")
+    public ApiResponse<TokenResponseDto> kakaoLogin(@RequestBody KakaoLoginRequestDto requestDto) {
+        // 1. 프론트가 던져준 카카오 액세스 토큰을 매니저에게 토스!
+        TokenResponseDto tokenResponse = authService.kakaoLogin(requestDto.getAccessToken());
         // 2. 발급받은 우리 서버 출입증 세트(Access/Refresh)를 예쁘게 포장해서 리턴!
         return ApiResponse.ok(tokenResponse);
     }

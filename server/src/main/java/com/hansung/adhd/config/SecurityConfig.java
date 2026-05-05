@@ -42,7 +42,9 @@ public class SecurityConfig {
                         .requestMatchers("/auth/child/login").permitAll()
 
                         // ⭐️ 신규 추가: 프론트엔드가 폰에서 발급받은 구글 토큰을 던져줄 새 API 주소 오픈!
-                        .requestMatchers("/auth/google").permitAll()
+                        //.requestMatchers("/auth/google").permitAll()
+                        // ⭐️ 카카오도 무사통과 시키도록 수정!
+                        .requestMatchers("/auth/google", "/auth/kakao").permitAll()
 
                         // ⭐️ /children 주소로 들어오는 요청은 무조건 인증(토큰)이 필요하다고 못 박음!
                         .requestMatchers("/children/**").authenticated()
