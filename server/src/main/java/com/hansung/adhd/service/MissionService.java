@@ -6,6 +6,7 @@ import com.hansung.adhd.exception.CustomException;
 import com.hansung.adhd.repository.ChildrenRepository;
 import com.hansung.adhd.repository.DailyMissionsRepository;
 import com.hansung.adhd.repository.PresetBigTasksRepository;
+import com.hansung.adhd.repository.PresetSmallTasksRepository;
 import com.hansung.adhd.repository.RoutinePresetsRepository;
 import com.hansung.adhd.response.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class MissionService {
     private final DailyMissionsRepository dailyMissionsRepository;
     private final ChildrenRepository childrenRepository;
     private final PresetBigTasksRepository presetBigTasksRepository;
+    private final PresetSmallTasksRepository presetSmallTasksRepository;
     private final RoutinePresetsRepository routinePresetsRepository;
 
     private static final double SUCCESS_THRESHOLD = 70.0; // 일별 성공 기준 달성률
@@ -37,9 +39,27 @@ public class MissionService {
     // 오늘의 미션 목록 조회
     @Transactional(readOnly = true)
     public List<MissionDto.MissionResponse> getTodayMissions(Long childId) {
-        return dailyMissionsRepository.findByChildIdAndDate(childId, LocalDate.now())
-                .stream()
-                .map(MissionDto.MissionResponse::from)
+        List<DailyMissions> missions = dailyMissionsRepository.findByChildIdAndDate(childId, LocalDate.now());
+
+        List<Long> bigTaskIds = missions.stream()
+                .filter(m -> m.getOriginBigTaskId() != null)
+                .map(DailyMissions::getOriginBigTaskId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<Long, List<MissionDto.SmallTaskResponse>> smallTaskMap =
+                presetSmallTasksRepository.findByBigTaskIdInOrderByOrderIndex(bigTaskIds)
+                        .stream()
+                        .collect(Collectors.groupingBy(
+                                s -> s.getBigTask().getId(),
+                                Collectors.mapping(MissionDto.SmallTaskResponse::from, Collectors.toList())
+                        ));
+
+        return missions.stream()
+                .map(m -> MissionDto.MissionResponse.from(
+                        m,
+                        smallTaskMap.getOrDefault(m.getOriginBigTaskId(), List.of())
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -65,7 +85,7 @@ public class MissionService {
                 request.getEndTime()
         );
 
-        return MissionDto.MissionResponse.from(dailyMissionsRepository.save(mission));
+        return MissionDto.MissionResponse.from(dailyMissionsRepository.save(mission), List.of());
     }
 
     // 미션 시작
@@ -73,7 +93,7 @@ public class MissionService {
     public MissionDto.MissionResponse startMission(Long missionId) {
         DailyMissions mission = getMissionOrThrow(missionId);
         mission.start(LocalDateTime.now());
-        return MissionDto.MissionResponse.from(mission);
+        return MissionDto.MissionResponse.from(mission, List.of());
     }
 
     // 미션 완료
@@ -91,7 +111,7 @@ public class MissionService {
         child.gainExp(mission.getAssignedExp());
         child.addGold(30);
 
-        return MissionDto.MissionResponse.from(mission);
+        return MissionDto.MissionResponse.from(mission, List.of());
     }
 
     // 미션 승인/거절
@@ -105,7 +125,7 @@ public class MissionService {
         } else {
             throw new CustomException(ErrorCode.INVALID_MISSION_STATUS);
         }
-        return MissionDto.MissionResponse.from(mission);
+        return MissionDto.MissionResponse.from(mission, List.of());
     }
 
     // 미션 삭제
@@ -194,6 +214,10 @@ public class MissionService {
                         presetBigTasksRepository.findByPresetIdOrderByOrderIndex(preset.getId());
 
                 for (PresetBigTasks bigTask : bigTasks) {
+                    if (dailyMissionsRepository.existsByChildIdAndOriginBigTaskIdAndDate(
+                            child.getId(), bigTask.getId(), today)) {
+                        continue;
+                    }
                     DailyMissions newMission = DailyMissions.create(
                             child, preset.getId(), bigTask.getId(),
                             preset.getTitle(), bigTask.getTitle(),

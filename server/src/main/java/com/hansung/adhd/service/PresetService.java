@@ -5,6 +5,7 @@ import com.hansung.adhd.domain.DailyMissions;
 import com.hansung.adhd.domain.Parents;
 import com.hansung.adhd.domain.PresetBigTasks;
 import com.hansung.adhd.domain.RoutinePresets;
+import com.hansung.adhd.domain.PresetSmallTasks;
 import com.hansung.adhd.dto.MissionDto;
 import com.hansung.adhd.dto.PresetDto;
 import com.hansung.adhd.exception.CustomException;
@@ -115,6 +116,39 @@ public class PresetService {
         return PresetDto.PresetResponse.from(preset);
     }
 
+    // 날짜 기준 프리셋 저장 (선택한 날짜의 미션들 → 프리셋)
+    @Transactional
+    public PresetDto.PresetResponse saveFromDate(PresetDto.SaveFromDateRequest request) {
+        Children child = childrenRepository.findById(request.getChildId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+
+        Parents parent = child.getParent();
+        if (parent == null) throw new CustomException(ErrorCode.PARENT_NOT_FOUND);
+
+        List<DailyMissions> missions = dailyMissionsRepository
+                .findByChildIdAndDate(request.getChildId(), request.getDate());
+
+        if (missions.isEmpty()) throw new CustomException(ErrorCode.MISSION_NOT_FOUND);
+
+        List<Long> bigTaskIds = missions.stream()
+                .filter(m -> m.getOriginBigTaskId() != null)
+                .map(DailyMissions::getOriginBigTaskId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        RoutinePresets preset = RoutinePresets.create(
+                parent, request.getTitle(), request.getDescription(), null, 1);
+        routinePresetsRepository.save(preset);
+
+        bigTaskIds.forEach(bigTaskId -> {
+            PresetBigTasks bigTask = presetBigTasksRepository.findById(bigTaskId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.BIG_TASK_NOT_FOUND));
+            bigTask.assignToPreset(preset);
+        });
+
+        return PresetDto.PresetResponse.from(preset);
+    }
+
     // 프리셋 삭제
     @Transactional
     public void deletePreset(Long presetId) {
@@ -170,7 +204,7 @@ public class PresetService {
         dailyMissionsRepository.saveAll(missions);
 
         return missions.stream()
-                .map(MissionDto.MissionResponse::from)
+                .map(m -> MissionDto.MissionResponse.from(m, List.of()))
                 .collect(Collectors.toList());
     }
 }

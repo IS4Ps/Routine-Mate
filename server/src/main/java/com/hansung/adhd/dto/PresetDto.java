@@ -37,6 +37,17 @@ public class PresetDto {
         private Integer durationDays;
     }
 
+    /** 날짜 기준 프리셋 저장 요청 */
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SaveFromDateRequest {
+        private Long      childId;
+        private LocalDate date;
+        private String    title;
+        private String    description;
+    }
+
     /** 프리셋 불러오기 요청 */
     @Getter
     @NoArgsConstructor

@@ -23,10 +23,10 @@ public class MissionScheduler {
         missionService.generateDailyMissionsFromPresets();
     }
 
-    // 테스트용 1분,  밀리초 단위: 60000ms = 1분
-    @Scheduled(fixedRate = 60000)
-    public void testSchedulerForProfessor() {
-        log.info("⏰ [테스트 알람] 1분이 지났습니다! 미션이 자동 생성됩니다!");
-        missionService.generateDailyMissionsFromPresets(); // ⭐️ 시연용
-    }
+    // 테스트용 1분 스케줄러 — 발표 전 비활성화
+//    @Scheduled(fixedRate = 60000)
+//    public void testSchedulerForProfessor() {
+//        log.info("⏰ [테스트 알람] 1분이 지났습니다! 미션이 자동 생성됩니다!");
+//        missionService.generateDailyMissionsFromPresets();
+//    }
 }

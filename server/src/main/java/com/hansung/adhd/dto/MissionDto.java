@@ -34,11 +34,29 @@ public class MissionDto {
         private String rejectReason;
     }
 
+    /** 미션 내 SmallTask */
+    @Getter
+    @Builder
+    public static class SmallTaskResponse {
+        private Long    smallTaskId;
+        private String  title;
+        private Integer orderIndex;
+
+        public static SmallTaskResponse from(com.hansung.adhd.domain.PresetSmallTasks s) {
+            return SmallTaskResponse.builder()
+                    .smallTaskId(s.getId())
+                    .title(s.getTitle())
+                    .orderIndex(s.getOrderIndex())
+                    .build();
+        }
+    }
+
     /** 미션 응답 */
     @Getter
     @Builder
     public static class MissionResponse {
         private Long          missionId;
+        private Long          originBigTaskId;
         private String        presetTitle;
         private String        bigTaskTitle;
         private String        tags;
@@ -51,10 +69,12 @@ public class MissionDto {
         private LocalDateTime startedAt;
         private LocalDateTime completedAt;
         private LocalDateTime approvedAt;
+        private List<SmallTaskResponse> smallTasks;
 
-        public static MissionResponse from(DailyMissions mission) {
+        public static MissionResponse from(DailyMissions mission, List<SmallTaskResponse> smallTasks) {
             return MissionResponse.builder()
                     .missionId(mission.getId())
+                    .originBigTaskId(mission.getOriginBigTaskId())
                     .presetTitle(mission.getPresetTitle())
                     .bigTaskTitle(mission.getBigTaskTitle())
                     .tags(mission.getTags())
@@ -67,6 +87,7 @@ public class MissionDto {
                     .startedAt(mission.getStartedAt())
                     .completedAt(mission.getCompletedAt())
                     .approvedAt(mission.getApprovedAt())
+                    .smallTasks(smallTasks)
                     .build();
         }
     }

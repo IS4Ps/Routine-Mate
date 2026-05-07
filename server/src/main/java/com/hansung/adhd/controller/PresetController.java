@@ -57,6 +57,14 @@ public class PresetController {
         return ResponseEntity.ok(ApiResponse.noContent());
     }
 
+    @Operation(summary = "날짜 기준 프리셋 저장",
+               description = "선택한 날짜의 미션들을 프리셋으로 저장합니다.")
+    @PostMapping("/save-from-date")
+    public ResponseEntity<ApiResponse<PresetDto.PresetResponse>> saveFromDate(
+            @RequestBody PresetDto.SaveFromDateRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(presetService.saveFromDate(request)));
+    }
+
     @Operation(summary = "프리셋 불러오기",
                description = "프리셋의 BigTask들을 선택한 날짜부터 DailyMissions로 일괄 생성합니다.")
     @PostMapping("/{presetId}/load")

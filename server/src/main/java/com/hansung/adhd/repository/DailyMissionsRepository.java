@@ -16,4 +16,7 @@ public interface DailyMissionsRepository extends JpaRepository<DailyMissions, Lo
 
     // 특정 기간(startDate ~ endDate) 내 아이의 미션 목록 조회
     List<DailyMissions> findByChildIdAndDateBetween(Long childId, LocalDate startDate, LocalDate endDate);
+
+    // 중복 체크용
+    boolean existsByChildIdAndOriginBigTaskIdAndDate(Long childId, Long originBigTaskId, LocalDate date);
 }
