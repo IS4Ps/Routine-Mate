@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface RoutinePresetsRepository extends JpaRepository<RoutinePresets, Long> {
-    List<RoutinePresets> findByParentId(Long parentId);
+    List<RoutinePresets> findByParentIdAndIsDeletedFalse(Long parentId);
 }

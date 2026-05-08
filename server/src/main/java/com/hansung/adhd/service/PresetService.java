@@ -42,7 +42,7 @@ public class PresetService {
         parentsRepository.findById(parentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PARENT_NOT_FOUND));
 
-        return routinePresetsRepository.findByParentId(parentId)
+        return routinePresetsRepository.findByParentIdAndIsDeletedFalse(parentId)
                 .stream()
                 .map(PresetDto.PresetResponse::from)
                 .toList();
@@ -57,7 +57,7 @@ public class PresetService {
         Parents parent = child.getParent();
         if (parent == null) throw new CustomException(ErrorCode.PARENT_NOT_FOUND);
 
-        return routinePresetsRepository.findByParentId(parent.getId())
+        return routinePresetsRepository.findByParentIdAndIsDeletedFalse(parent.getId())
                 .stream()
                 .map(PresetDto.PresetResponse::from)
                 .toList();
@@ -141,7 +141,7 @@ public class PresetService {
         if (parent == null) throw new CustomException(ErrorCode.PARENT_NOT_FOUND);
 
         List<DailyMissions> missions = dailyMissionsRepository
-                .findByChildIdAndDate(request.getChildId(), request.getDate());
+                .findByChildIdAndDateAndIsDeletedFalse(request.getChildId(), request.getDate());
 
         if (missions.isEmpty()) throw new CustomException(ErrorCode.MISSION_NOT_FOUND);
 

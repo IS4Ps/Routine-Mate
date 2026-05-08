@@ -68,7 +68,7 @@ public class OfflineRewardService {
         LocalDate sunday = LocalDate.now().with(DayOfWeek.SUNDAY);
 
         List<DailyMissions> weeklyMissions = dailyMissionsRepository
-                .findByChildIdAndDateBetween(reward.getChild().getId(), monday, sunday);
+                .findByChildIdAndDateBetweenAndIsDeletedFalse(reward.getChild().getId(), monday, sunday);
 
         // 날짜별 그룹핑 후 성공 일수 계산
         Map<LocalDate, List<DailyMissions>> missionsByDate = weeklyMissions.stream()

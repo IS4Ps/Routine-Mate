@@ -39,7 +39,7 @@ public class MissionService {
     // 오늘의 미션 목록 조회
     @Transactional(readOnly = true)
     public List<MissionDto.MissionResponse> getTodayMissions(Long childId) {
-        List<DailyMissions> missions = dailyMissionsRepository.findByChildIdAndDate(childId, LocalDate.now());
+        List<DailyMissions> missions = dailyMissionsRepository.findByChildIdAndDateAndIsDeletedFalse(childId, LocalDate.now());
 
         List<Long> bigTaskIds = missions.stream()
                 .filter(m -> m.getOriginBigTaskId() != null)
@@ -146,7 +146,7 @@ public class MissionService {
 
         // 이번 주 전체 미션 조회
         List<DailyMissions> weeklyMissions =
-                dailyMissionsRepository.findByChildIdAndDateBetween(childId, monday, sunday);
+                dailyMissionsRepository.findByChildIdAndDateBetweenAndIsDeletedFalse(childId, monday, sunday);
 
         // 날짜별로 그룹핑
         Map<LocalDate, List<DailyMissions>> missionsByDate = weeklyMissions.stream()
@@ -207,14 +207,14 @@ public class MissionService {
             Parents parent = child.getParent();
             if (parent == null) continue;
 
-            List<RoutinePresets> parentPresets = routinePresetsRepository.findByParentId(parent.getId());
+            List<RoutinePresets> parentPresets = routinePresetsRepository.findByParentIdAndIsDeletedFalse(parent.getId());
 
             for (RoutinePresets preset : parentPresets) {
                 List<PresetBigTasks> bigTasks =
                         presetBigTasksRepository.findByPresetIdOrderByOrderIndex(preset.getId());
 
                 for (PresetBigTasks bigTask : bigTasks) {
-                    if (dailyMissionsRepository.existsByChildIdAndOriginBigTaskIdAndDate(
+                    if (dailyMissionsRepository.existsByChildIdAndOriginBigTaskIdAndDateAndIsDeletedFalse(
                             child.getId(), bigTask.getId(), today)) {
                         continue;
                     }

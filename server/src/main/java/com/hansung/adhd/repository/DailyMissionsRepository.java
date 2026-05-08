@@ -9,14 +9,14 @@ import java.util.List;
 public interface DailyMissionsRepository extends JpaRepository<DailyMissions, Long> {
 
     // 오늘의 미션 목록
-    List<DailyMissions> findByChildIdAndDate(Long childId, LocalDate date);
+    List<DailyMissions> findByChildIdAndDateAndIsDeletedFalse(Long childId, LocalDate date);
 
     // 특정 상태의 미션 목록
-    List<DailyMissions> findByChildIdAndStatus(Long childId, String status);
+    List<DailyMissions> findByChildIdAndStatusAndIsDeletedFalse(Long childId, String status);
 
     // 특정 기간(startDate ~ endDate) 내 아이의 미션 목록 조회
-    List<DailyMissions> findByChildIdAndDateBetween(Long childId, LocalDate startDate, LocalDate endDate);
+    List<DailyMissions> findByChildIdAndDateBetweenAndIsDeletedFalse(Long childId, LocalDate startDate, LocalDate endDate);
 
     // 중복 체크용
-    boolean existsByChildIdAndOriginBigTaskIdAndDate(Long childId, Long originBigTaskId, LocalDate date);
+    boolean existsByChildIdAndOriginBigTaskIdAndDateAndIsDeletedFalse(Long childId, Long originBigTaskId, LocalDate date);
 }
