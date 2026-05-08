@@ -36,6 +36,19 @@ public class ChildrenController {
     }
 
     /**
+     * [POST] QR 연동용 일회용 토큰 발급 (10분 유효)
+     */
+    @PostMapping("/{childId}/link-token")
+    public ApiResponse<String> generateLinkToken(
+            @PathVariable Long childId,
+            Authentication authentication) {
+
+        Long parentId = Long.parseLong(authentication.getName());
+        String token = childrenService.generateLinkToken(childId, parentId);
+        return ApiResponse.ok(token);
+    }
+
+    /**
      * [PATCH] 아이 기기 번호 갱신 API
      */
     @PatchMapping("/{childId}/device")

@@ -3,6 +3,7 @@ package com.hansung.adhd.controller;
 import com.hansung.adhd.dto.request.ChildLoginRequestDto;
 import com.hansung.adhd.dto.request.GoogleLoginRequestDto;
 import com.hansung.adhd.dto.request.KakaoLoginRequestDto;
+import com.hansung.adhd.dto.response.ChildLinkResponseDto;
 import com.hansung.adhd.dto.response.TokenResponseDto;
 import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.AuthService;
@@ -24,6 +25,17 @@ public class AuthController {
     public ApiResponse<TokenResponseDto> childLogin(@RequestBody ChildLoginRequestDto requestDto) {
         TokenResponseDto tokenResponse = authService.childLogin(requestDto.deviceId());
         return ApiResponse.ok(tokenResponse);
+    }
+
+    /**
+     * QR 스캔 후 아이 기기 등록 + 로그인
+     * [POST] /auth/child/register-by-qr
+     */
+    @PostMapping("/child/register-by-qr")
+    public ApiResponse<ChildLinkResponseDto> registerChildByQr(
+            @RequestParam String linkToken,
+            @RequestParam String deviceId) {
+        return ApiResponse.ok(authService.registerChildByQr(linkToken, deviceId));
     }
 
     /**

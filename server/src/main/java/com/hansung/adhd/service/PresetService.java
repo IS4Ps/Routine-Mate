@@ -36,13 +36,28 @@ public class PresetService {
     private final ChildrenRepository childrenRepository;
     private final DailyMissionsRepository dailyMissionsRepository;
 
-    // 부모의 프리셋 목록 조회
+    // 부모의 프리셋 목록 조회 (parentId 기준)
     @Transactional(readOnly = true)
     public List<PresetDto.PresetResponse> getPresets(Long parentId) {
         parentsRepository.findById(parentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PARENT_NOT_FOUND));
 
         return routinePresetsRepository.findByParentId(parentId)
+                .stream()
+                .map(PresetDto.PresetResponse::from)
+                .toList();
+    }
+
+    // 아이 ID로 프리셋 목록 조회 (save-from-date 이후 바로 목록 조회 시 사용)
+    @Transactional(readOnly = true)
+    public List<PresetDto.PresetResponse> getPresetsByChildId(Long childId) {
+        Children child = childrenRepository.findById(childId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+
+        Parents parent = child.getParent();
+        if (parent == null) throw new CustomException(ErrorCode.PARENT_NOT_FOUND);
+
+        return routinePresetsRepository.findByParentId(parent.getId())
                 .stream()
                 .map(PresetDto.PresetResponse::from)
                 .toList();

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.hansung.adhd.dto.response.ChildResponseDto;
 
+import java.util.UUID;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ public class ChildrenService {
 
     private final ChildrenRepository childrenRepository;
     private final ParentsRepository parentsRepository;
+    private final ChildLinkTokenStore childLinkTokenStore;
 
     // ⭐️ 핵심 로직: 부모님 밑으로 아이 프로필 생성하기
     // ⭐️ 파라미터가 Long parentId 에서 String parentEmail 로 변경!
@@ -47,6 +50,22 @@ public class ChildrenService {
         log.info("새로운 아이 프로필 생성 완료! 아이 ID: {}, 부모 ID: {}", savedChild.getId(), parentId);
 
         return savedChild.getId();
+    }
+
+    /**
+     * QR 연동용 일회용 토큰 발급 (10분 유효)
+     */
+    public String generateLinkToken(Long childId, Long parentId) {
+        Children child = childrenRepository.findById(childId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+
+        if (!child.getParent().getId().equals(parentId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
+        String token = UUID.randomUUID().toString();
+        childLinkTokenStore.save(token, childId);
+        return token;
     }
 
     /**

@@ -67,6 +67,7 @@ public class PresetDto {
     @Builder
     public static class PresetResponse {
         private Long    presetId;
+        private Long    parentId;
         private String  title;
         private String  description;
         private String  icon;
@@ -75,6 +76,7 @@ public class PresetDto {
         public static PresetResponse from(RoutinePresets preset) {
             return PresetResponse.builder()
                     .presetId(preset.getId())
+                    .parentId(preset.getParent() != null ? preset.getParent().getId() : null)
                     .title(preset.getTitle())
                     .description(preset.getDescription())
                     .icon(preset.getIcon())

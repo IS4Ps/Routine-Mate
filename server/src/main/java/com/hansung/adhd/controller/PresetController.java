@@ -20,10 +20,14 @@ public class PresetController {
 
     private final PresetService presetService;
 
-    @Operation(summary = "프리셋 목록 조회", description = "부모 계정의 루틴 프리셋 목록을 조회합니다.")
+    @Operation(summary = "프리셋 목록 조회", description = "parentId 또는 childId로 프리셋 목록을 조회합니다. 둘 중 하나만 보내면 됩니다.")
     @GetMapping
     public ResponseEntity<ApiResponse<List<PresetDto.PresetResponse>>> getPresets(
-            @RequestParam Long parentId) {
+            @RequestParam(required = false) Long parentId,
+            @RequestParam(required = false) Long childId) {
+        if (childId != null) {
+            return ResponseEntity.ok(ApiResponse.ok(presetService.getPresetsByChildId(childId)));
+        }
         return ResponseEntity.ok(ApiResponse.ok(presetService.getPresets(parentId)));
     }
 

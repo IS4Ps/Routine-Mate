@@ -14,6 +14,7 @@ import com.hansung.adhd.repository.ChildrenRepository;
 import com.hansung.adhd.repository.ParentsRepository;
 import com.hansung.adhd.repository.RefreshTokenRepository;
 import com.hansung.adhd.response.ErrorCode;
+import com.hansung.adhd.dto.response.ChildLinkResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,10 +35,9 @@ public class AuthService {
 
     private final ChildrenRepository childrenRepository;
     private final JwtProvider jwtProvider;
-
-    // ⭐️ 2단계 추가: 자판기 로직을 위해 부모님 창고와 리프레시 토큰 창고 일꾼 추가
     private final ParentsRepository parentsRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final ChildLinkTokenStore childLinkTokenStore;
 
     // ⭐️ 환경 변수 세팅해둔 구글 클라이언트 ID를 가져옵니다!
     @Value("${GOOGLE_CLIENT_ID}")
@@ -90,6 +90,26 @@ public class AuthService {
 
         // 4. 새 토큰과 기존 리프레시 토큰을 담아서 프론트엔드로 배송!
         return new TokenResponseDto(newAccessToken, givenRefreshToken);
+    }
+
+    /**
+     * QR 스캔 후 아이 기기 등록 + 로그인
+     */
+    @Transactional
+    public ChildLinkResponseDto registerChildByQr(String linkToken, String deviceId) {
+        Long childId = childLinkTokenStore.getChildId(linkToken);
+        if (childId == null) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+
+        Children child = childrenRepository.findById(childId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+
+        child.updateDevice(deviceId);
+        childLinkTokenStore.remove(linkToken);
+
+        String accessToken = jwtProvider.createAccessToken(child.getId(), "ROLE_CHILD");
+        return new ChildLinkResponseDto(accessToken, child.getId(), child.getNickname());
     }
 
     /**
