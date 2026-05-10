@@ -25,27 +25,23 @@ public class ChildrenService {
     private final ChildLinkTokenStore childLinkTokenStore;
 
     // ⭐️ 핵심 로직: 부모님 밑으로 아이 프로필 생성하기
-    // ⭐️ 파라미터가 Long parentId 에서 String parentEmail 로 변경!
     @Transactional
     public Long createChild(Long parentId, ChildCreateRequestDto dto) {
 
-        // 1. 이메일 말고, 다시 ID(PK)로 창고에서 부모님을 찾는다!
+        // 1. 부모님 찾기!
         Parents parent = parentsRepository.findById(parentId)
                 .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 부모님입니다. ID: " + parentId));
 
-        // 2. 기기 번호 중복 체크
-        if (childrenRepository.findByLastConnectedDeviceId(dto.getLastConnectedDeviceId()).isPresent()) {
-            throw new IllegalArgumentException("이미 다른 아이에게 등록된 기기 번호입니다.");
-        }
+        // 🚨 기기 번호 중복 체크 로직 삭제!!! (QR 연동할 때만 하면 됨!)
 
-        // 3. 아이 객체 조립!
+        // 2. 아이 객체 조립! (이름만 넣어서 순수하게 프로필만 생성!)
         Children child = Children.builder()
                 .parent(parent)
                 .nickname(dto.getNickname())
-                .lastConnectedDeviceId(dto.getLastConnectedDeviceId())
+                // .lastConnectedDeviceId(...) 🚨 삭제!!
                 .build();
 
-        // 4. 저장!
+        // 3. 저장!
         Children savedChild = childrenRepository.save(child);
         log.info("새로운 아이 프로필 생성 완료! 아이 ID: {}, 부모 ID: {}", savedChild.getId(), parentId);
 
