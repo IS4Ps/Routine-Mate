@@ -44,7 +44,8 @@ public class PresetDto {
     public static class SaveFromDateRequest {
         private Long      parentId;
         private Long      childId;
-        private LocalDate date;
+        private LocalDate startDate;
+        private LocalDate endDate;
         private String    title;
         private String    description;
     }

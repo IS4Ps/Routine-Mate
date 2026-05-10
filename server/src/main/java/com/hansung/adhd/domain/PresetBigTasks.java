@@ -32,6 +32,9 @@ public class PresetBigTasks extends BaseEntity {
     @Column(name = "order_index")
     private Integer orderIndex;
 
+    @Column(name = "day_index")
+    private Integer dayIndex;
+
     @Column(name = "start_time", length = 10)
     private String startTime;
 
@@ -57,6 +60,11 @@ public class PresetBigTasks extends BaseEntity {
 
     public void assignToPreset(RoutinePresets preset) {
         this.preset = preset;
+    }
+
+    public void assignToPresetWithDayIndex(RoutinePresets preset, int dayIndex) {
+        this.preset    = preset;
+        this.dayIndex  = dayIndex;
     }
 
     public void update(String title, String icon, Integer orderIndex,

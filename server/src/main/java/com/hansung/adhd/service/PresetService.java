@@ -21,9 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -131,35 +133,42 @@ public class PresetService {
         return PresetDto.PresetResponse.from(preset);
     }
 
-    // 날짜 기준 프리셋 저장 (선택한 날짜의 미션들 → 프리셋)
+    // 날짜 기준 프리셋 저장 (선택한 날짜 범위의 미션들 → 프리셋)
     @Transactional
     public PresetDto.PresetResponse saveFromDate(PresetDto.SaveFromDateRequest request) {
-        Children child = childrenRepository.findById(request.getChildId())
+        childrenRepository.findById(request.getChildId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
 
         Parents parent = parentsRepository.findById(request.getParentId())
                 .orElseThrow(() -> new CustomException(ErrorCode.PARENT_NOT_FOUND));
 
+        LocalDate startDate = request.getStartDate();
+        LocalDate endDate   = request.getEndDate() != null ? request.getEndDate() : startDate;
+        int durationDays    = (int) ChronoUnit.DAYS.between(startDate, endDate) + 1;
+
+        // 날짜 범위 내 전체 미션 조회
         List<DailyMissions> missions = dailyMissionsRepository
-                .findByChildIdAndDateAndIsDeletedFalse(request.getChildId(), request.getDate());
+                .findByChildIdAndDateBetweenAndIsDeletedFalse(request.getChildId(), startDate, endDate);
 
         if (missions.isEmpty()) throw new CustomException(ErrorCode.MISSION_NOT_FOUND);
 
-        List<Long> bigTaskIds = missions.stream()
-                .filter(m -> m.getOriginBigTaskId() != null)
-                .map(DailyMissions::getOriginBigTaskId)
-                .distinct()
-                .collect(Collectors.toList());
-
         RoutinePresets preset = RoutinePresets.create(
-                parent, request.getTitle(), request.getDescription(), null, 1);
+                parent, request.getTitle(), request.getDescription(), null, durationDays);
         routinePresetsRepository.save(preset);
 
-        bigTaskIds.forEach(bigTaskId -> {
-            PresetBigTasks bigTask = presetBigTasksRepository.findById(bigTaskId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.BIG_TASK_NOT_FOUND));
-            bigTask.assignToPreset(preset);
-        });
+        // 날짜별 dayIndex 계산해서 BigTask에 할당
+        missions.stream()
+                .filter(m -> m.getOriginBigTaskId() != null)
+                .collect(Collectors.toMap(
+                        DailyMissions::getOriginBigTaskId,
+                        m -> (int) ChronoUnit.DAYS.between(startDate, m.getDate()),
+                        (existing, replacement) -> existing  // 중복 bigTaskId는 첫 번째 유지
+                ))
+                .forEach((bigTaskId, dayIndex) -> {
+                    PresetBigTasks bigTask = presetBigTasksRepository.findById(bigTaskId)
+                            .orElseThrow(() -> new CustomException(ErrorCode.BIG_TASK_NOT_FOUND));
+                    bigTask.assignToPresetWithDayIndex(preset, dayIndex);
+                });
 
         return PresetDto.PresetResponse.from(preset);
     }
@@ -193,18 +202,21 @@ public class PresetService {
         LocalDate startDate = request.getStartDate();
 
         List<DailyMissions> missions = bigTasks.stream()
-                .map(bigTask -> DailyMissions.create(
-                        child,
-                        preset.getId(),
-                        bigTask.getId(),
-                        preset.getTitle(),
-                        bigTask.getTitle(),
-                        null,
-                        request.getAssignedExpPerMission(),
-                        startDate,
-                        bigTask.getStartTime(),
-                        bigTask.getEndTime()
-                ))
+                .map(bigTask -> {
+                    int dayOffset = bigTask.getDayIndex() != null ? bigTask.getDayIndex() : 0;
+                    return DailyMissions.create(
+                            child,
+                            preset.getId(),
+                            bigTask.getId(),
+                            preset.getTitle(),
+                            bigTask.getTitle(),
+                            null,
+                            request.getAssignedExpPerMission(),
+                            startDate.plusDays(dayOffset),
+                            bigTask.getStartTime(),
+                            bigTask.getEndTime()
+                    );
+                })
                 .collect(Collectors.toList());
 
         dailyMissionsRepository.saveAll(missions);
