@@ -226,8 +226,10 @@ public class AuthService {
             String refreshToken = jwtProvider.createRefreshToken();
 
             // 4. ⭐️ 기존 토큰이 있으면 지우고, 새 토큰으로 깔끔하게 저장! (DB 중복 방지)
-            refreshTokenRepository.findByParentEmail(parent.getEmail())
-                    .ifPresent(existingToken -> refreshTokenRepository.delete(existingToken));
+            List<RefreshToken> existingTokens = refreshTokenRepository.findByParentEmail(parent.getEmail());
+            if (!existingTokens.isEmpty()) {
+                refreshTokenRepository.deleteAll(existingTokens); // 여러 개를 한 번에 싹 다 지움!
+            }
 
             refreshTokenRepository.save(new RefreshToken(refreshToken, parent.getEmail()));
 
