@@ -137,8 +137,8 @@ public class PresetService {
         Children child = childrenRepository.findById(request.getChildId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
 
-        Parents parent = child.getParent();
-        if (parent == null) throw new CustomException(ErrorCode.PARENT_NOT_FOUND);
+        Parents parent = parentsRepository.findById(request.getParentId())
+                .orElseThrow(() -> new CustomException(ErrorCode.PARENT_NOT_FOUND));
 
         List<DailyMissions> missions = dailyMissionsRepository
                 .findByChildIdAndDateAndIsDeletedFalse(request.getChildId(), request.getDate());

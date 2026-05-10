@@ -42,6 +42,7 @@ public class PresetDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SaveFromDateRequest {
+        private Long      parentId;
         private Long      childId;
         private LocalDate date;
         private String    title;
