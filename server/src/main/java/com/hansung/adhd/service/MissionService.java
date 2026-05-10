@@ -63,6 +63,33 @@ public class MissionService {
                 .collect(Collectors.toList());
     }
 
+    // 날짜별 미션 목록 조회
+    @Transactional(readOnly = true)
+    public List<MissionDto.MissionResponse> getMissionsByDate(Long childId, LocalDate date) {
+        List<DailyMissions> missions = dailyMissionsRepository.findByChildIdAndDateAndIsDeletedFalse(childId, date);
+
+        List<Long> bigTaskIds = missions.stream()
+                .filter(m -> m.getOriginBigTaskId() != null)
+                .map(DailyMissions::getOriginBigTaskId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<Long, List<MissionDto.SmallTaskResponse>> smallTaskMap =
+                presetSmallTasksRepository.findByBigTaskIdInOrderByOrderIndex(bigTaskIds)
+                        .stream()
+                        .collect(Collectors.groupingBy(
+                                s -> s.getBigTask().getId(),
+                                Collectors.mapping(MissionDto.SmallTaskResponse::from, Collectors.toList())
+                        ));
+
+        return missions.stream()
+                .map(m -> MissionDto.MissionResponse.from(
+                        m,
+                        smallTaskMap.getOrDefault(m.getOriginBigTaskId(), List.of())
+                ))
+                .collect(Collectors.toList());
+    }
+
     // 미션 생성
     @Transactional
     public MissionDto.MissionResponse createMission(MissionDto.CreateRequest request) {
