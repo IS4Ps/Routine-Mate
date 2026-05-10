@@ -190,30 +190,21 @@ public class PresetService {
             throw new CustomException(ErrorCode.PRESET_NOT_FOUND);
         }
 
-        // BigTask들의 원본 날짜 중 가장 빠른 날짜를 기준일로 잡음
-        // (프리셋 저장 시 BigTask들이 특정 날짜 기반으로 만들어진 경우)
-        // 현재는 BigTask에 날짜 정보가 없으므로 순서(orderIndex)를 날짜 offset으로 사용
         LocalDate startDate = request.getStartDate();
 
         List<DailyMissions> missions = bigTasks.stream()
-                .map(bigTask -> {
-                    // orderIndex를 dayOffset으로 활용 (0부터 시작)
-                    int dayOffset = bigTask.getOrderIndex() != null ? bigTask.getOrderIndex() : 0;
-                    LocalDate missionDate = startDate.plusDays(dayOffset);
-
-                    return DailyMissions.create(
-                            child,
-                            preset.getId(),
-                            bigTask.getId(),
-                            preset.getTitle(),
-                            bigTask.getTitle(),
-                            null,
-                            request.getAssignedExpPerMission(),
-                            missionDate,
-                            bigTask.getStartTime(),
-                            bigTask.getEndTime()
-                    );
-                })
+                .map(bigTask -> DailyMissions.create(
+                        child,
+                        preset.getId(),
+                        bigTask.getId(),
+                        preset.getTitle(),
+                        bigTask.getTitle(),
+                        null,
+                        request.getAssignedExpPerMission(),
+                        startDate,
+                        bigTask.getStartTime(),
+                        bigTask.getEndTime()
+                ))
                 .collect(Collectors.toList());
 
         dailyMissionsRepository.saveAll(missions);
