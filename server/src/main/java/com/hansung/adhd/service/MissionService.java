@@ -9,6 +9,7 @@ import com.hansung.adhd.repository.PresetBigTasksRepository;
 import com.hansung.adhd.repository.PresetSmallTasksRepository;
 import com.hansung.adhd.repository.RoutinePresetsRepository;
 import com.hansung.adhd.response.ErrorCode;
+import com.hansung.adhd.dto.AiRoutineDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -261,5 +262,40 @@ public class MissionService {
     private DailyMissions getMissionOrThrow(Long missionId) {
         return dailyMissionsRepository.findById(missionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
+    }
+
+    // ── AI 추천 루틴을 실제 미션으로 자동 생성 ─────────────────────────────
+    @Transactional
+    public List<MissionDto.MissionResponse> createMissionsFromAi(Long childId, List<AiRoutineDto.Recommendation> recommendations) {
+        Children child = childrenRepository.findById(childId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+
+        List<DailyMissions> newMissions = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        // AI가 추천해준 목록을 쓱쓱 돌면서 DailyMission 엔티티로 변환!
+        for (AiRoutineDto.Recommendation rec : recommendations) {
+            DailyMissions mission = DailyMissions.create(
+                    child,
+                    null, // AI가 만든 거라 원본 Preset 없음
+                    null, // 원본 BigTask 없음
+                    "AI 맞춤 추천 루틴", // presetTitle
+                    rec.getTitle(), // AI가 지어준 제목
+                    "AI추천,맞춤형", // tags
+                    rec.getExp(), // AI가 책정한 경험치
+                    today,
+                    null, // startTime
+                    null  // endTime
+            );
+            newMissions.add(mission);
+        }
+
+        // DB에 일괄 저장
+        dailyMissionsRepository.saveAll(newMissions);
+
+        // 깔끔하게 DTO로 변환해서 리턴
+        return newMissions.stream()
+                .map(MissionDto.MissionResponse::from)
+                .collect(Collectors.toList());
     }
 }
