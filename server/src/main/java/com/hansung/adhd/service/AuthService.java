@@ -25,6 +25,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Collections;
 
@@ -151,9 +153,11 @@ public class AuthService {
             String accessToken = jwtProvider.createAccessToken(parent.getId(), "ROLE_PARENT");
             String refreshToken = jwtProvider.createRefreshToken();
 
-            // 6. ⭐️ 기존 토큰이 있으면 지우고, 새 토큰으로 깔끔하게 저장! (DB 중복 방지)
-            refreshTokenRepository.findByParentEmail(parent.getEmail())
-                    .ifPresent(existingToken -> refreshTokenRepository.delete(existingToken));
+            // 6. ⭐️ [수정된 코드] 좀비 토큰 싹 다 불러서 모조리 척살!
+            List<RefreshToken> existingTokens = refreshTokenRepository.findByParentEmail(parent.getEmail());
+            if (!existingTokens.isEmpty()) {
+                refreshTokenRepository.deleteAll(existingTokens); // 여러 개를 한 번에 싹 다 지움!
+            }
 
             refreshTokenRepository.save(new RefreshToken(refreshToken, parent.getEmail()));
 
