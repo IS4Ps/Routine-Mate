@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Collections;
 
 @Slf4j
 @Service
@@ -295,7 +296,7 @@ public class MissionService {
 
         // 깔끔하게 DTO로 변환해서 리턴
         return newMissions.stream()
-                .map(MissionDto.MissionResponse::from)
-                .collect(Collectors.toList());
+                .map(mission -> MissionDto.MissionResponse.from(mission, java.util.Collections.emptyList()))
+                .collect(java.util.stream.Collectors.toList());
     }
 }
