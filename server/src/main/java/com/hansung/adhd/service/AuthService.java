@@ -151,7 +151,10 @@ public class AuthService {
             String accessToken = jwtProvider.createAccessToken(parent.getId(), "ROLE_PARENT");
             String refreshToken = jwtProvider.createRefreshToken();
 
-            // 6. 찐 리프레시 토큰은 DB에 얌전히 저장 (기존 토큰이 있다면 덮어쓰거나 갱신하는 로직으로 발전시킬 수 있음)
+            // 6. ⭐️ 기존 토큰이 있으면 지우고, 새 토큰으로 깔끔하게 저장! (DB 중복 방지)
+            refreshTokenRepository.findByParentEmail(parent.getEmail())
+                    .ifPresent(existingToken -> refreshTokenRepository.delete(existingToken));
+
             refreshTokenRepository.save(new RefreshToken(refreshToken, parent.getEmail()));
 
             // 7. 자네가 쓰던 TokenResponseDto에 예쁘게 포장해서 반환!
@@ -217,6 +220,10 @@ public class AuthService {
             // 3. 우리 서버 전용 JWT 토큰 뚝딱!
             String accessToken = jwtProvider.createAccessToken(parent.getId(), "ROLE_PARENT");
             String refreshToken = jwtProvider.createRefreshToken();
+
+            // 4. ⭐️ 기존 토큰이 있으면 지우고, 새 토큰으로 깔끔하게 저장! (DB 중복 방지)
+            refreshTokenRepository.findByParentEmail(parent.getEmail())
+                    .ifPresent(existingToken -> refreshTokenRepository.delete(existingToken));
 
             refreshTokenRepository.save(new RefreshToken(refreshToken, parent.getEmail()));
 

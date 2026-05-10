@@ -46,6 +46,8 @@ dependencies {
     // OAuth2 클라이언트 의존성 (구글, 카카오 소셜 로그인 특수 장비!)
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'com.google.api-client:google-api-client:1.34.1'
+    // ⭐️ 유효성 검사 일꾼(Hibernate Validator) 추가!
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {
