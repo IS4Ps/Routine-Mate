@@ -9,6 +9,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 // 더 이상 사용하지 않는 클래스 임포트 제거 (오류 방지)
 // import com.hansung.adhd.service.CustomOAuth2UserService;
@@ -32,43 +35,47 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
 
-                // 2. ★ JWT의 핵심: "서버는 기억력이 없다(Stateless)" 선언 ★
+                // 2. CORS 설정 적용
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // 3. ★ JWT의 핵심: "서버는 기억력이 없다(Stateless)" 선언 ★
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 3. 구역별 출입 통제소 (URL 권한 설정)
+                // 4. 구역별 출입 통제소 (URL 권한 설정)
                 .authorizeHttpRequests(auth -> auth
-                        // Swagger API 문서와 아이 기기 로그인 주소는 출입증 없이 무사통과!
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/auth/child/login").permitAll()
+                        // 인증 없이 접근 가능한 경로들
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/auth/**"
+                        ).permitAll()
 
-                        // ⭐️ 신규 추가: 프론트엔드가 폰에서 발급받은 구글 토큰을 던져줄 새 API 주소 오픈!
-                        //.requestMatchers("/auth/google").permitAll()
-                        // ⭐️ 카카오도 무사통과 시키도록 수정!
-                        .requestMatchers("/auth/google", "/auth/kakao").permitAll()
-                        .requestMatchers("/auth/child/register-by-qr").permitAll()
+                        // ⭐️ /children 및 그 하위 경로는 무조건 인증 필요!
+                        .requestMatchers("/children", "/children/**").authenticated()
+                        .requestMatchers("/parents/**").authenticated()
 
-                        // ⭐️ /children 주소로 들어오는 요청은 무조건 인증(토큰)이 필요하다고 못 박음!
-                        .requestMatchers("/children/**").authenticated()
-                        // 이 아래는 연동하면서 토큰 발급 안 받기 위함
-                        .requestMatchers("/children/**").permitAll()
-                        .requestMatchers("/parents/**").permitAll()
-                        .requestMatchers("/api/**").permitAll()
-
-                        // 그 외의 모든 찔러보기(API 요청)는 무조건 인증(토큰)을 거쳐야 함
+                        // 그 외의 모든 요청도 인증 필요
                         .anyRequest().authenticated()
                 )
 
-                // ⭐️ 철거: OAuth2 로그인 세팅 완전 차단! (더 이상 웹 뷰 기반 리다이렉트 안 함)
-                /*
-                .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                        .successHandler(oAuth2SuccessHandler)
-                )
-                */
-
-                // 4. 문지기 배치 작전!
+                // 5. 문지기 배치 작전!
                 .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.addAllowedOriginPattern("*"); // 모든 Origin 허용 (브라우저용)
+        configuration.addAllowedMethod("*");        // GET, POST, PUT, DELETE 등 모두 허용
+        configuration.addAllowedHeader("*");        // 모든 Header 허용
+        configuration.setAllowCredentials(true);    // 자격 증명 허용 (쿠키 등)
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
