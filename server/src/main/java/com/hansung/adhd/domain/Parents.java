@@ -29,4 +29,11 @@ public class Parents extends BaseEntity {
     // ⭐️나중에 구글/카카오 소셜 로그인을 위해
     @Column(length = 50)
     private String provider;
+
+    @Column(name = "fcm_token", length = 255)
+    private String fcmToken;
+
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
 }

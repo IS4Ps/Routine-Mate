@@ -48,6 +48,8 @@ dependencies {
     implementation 'com.google.api-client:google-api-client:1.34.1'
     // ⭐️ 유효성 검사 일꾼(Hibernate Validator) 추가!
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Firebase Admin SDK (FCM 푸시 알림)
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 tasks.named('test') {
