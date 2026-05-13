@@ -38,3 +38,6 @@ out/
 
 # DB 비밀번호 등 민감한 환경설정 파일 Git 업로드 방지
 **/application.properties
+
+# Firebase 서비스 계정 키 (절대 커밋 금지!)
+**/firebase-service-account.json
