@@ -95,6 +95,17 @@ public class ChildrenController {
     }
 
     /**
+     * [PATCH] 직업 선택 API
+     */
+    @PatchMapping("/{childId}/job")
+    public ApiResponse<Void> selectJob(
+            @PathVariable Long childId,
+            @RequestParam Long jobId) {
+        childrenService.selectJob(childId, jobId);
+        return ApiResponse.noContent();
+    }
+
+    /**
      * [DELETE] 아이 계정 삭제 (소프트 삭제) API
      */
     @DeleteMapping("/{childId}")

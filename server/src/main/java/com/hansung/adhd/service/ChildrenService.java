@@ -1,10 +1,12 @@
 package com.hansung.adhd.service;
 
 import com.hansung.adhd.domain.Children;
+import com.hansung.adhd.domain.Jobs;
 import com.hansung.adhd.domain.Parents;
 import com.hansung.adhd.dto.request.ChildCreateRequestDto;
 import com.hansung.adhd.exception.CustomException;
 import com.hansung.adhd.repository.ChildrenRepository;
+import com.hansung.adhd.repository.JobsRepository;
 import com.hansung.adhd.repository.ParentsRepository;
 import com.hansung.adhd.response.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class ChildrenService {
 
     private final ChildrenRepository childrenRepository;
     private final ParentsRepository parentsRepository;
+    private final JobsRepository jobsRepository;
     private final ChildLinkTokenStore childLinkTokenStore;
 
     // ⭐️ 핵심 로직: 부모님 밑으로 아이 프로필 생성하기
@@ -118,6 +121,18 @@ public class ChildrenService {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
         child.updateNickname(newNickname);
+    }
+
+    /**
+     * 직업 선택
+     */
+    @Transactional
+    public void selectJob(Long childId, Long jobId) {
+        Children child = childrenRepository.findById(childId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
+        Jobs job = jobsRepository.findById(jobId)
+                .orElseThrow(() -> new CustomException(ErrorCode.JOB_NOT_FOUND));
+        child.selectJob(job);
     }
 
     /**
