@@ -104,4 +104,8 @@ public class Children extends BaseEntity {
     public void updateNickname(String newNickname) {
         this.nickname = newNickname;
     }
+
+    public void selectJob(Jobs job) {
+        this.job = job;
+    }
 }
