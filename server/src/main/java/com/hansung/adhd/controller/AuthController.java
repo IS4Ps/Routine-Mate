@@ -8,6 +8,7 @@ import com.hansung.adhd.dto.response.TokenResponseDto;
 import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -46,6 +47,19 @@ public class AuthController {
     public ApiResponse<TokenResponseDto> refresh(@RequestHeader("Refresh-Token") String refreshToken) {
         TokenResponseDto newTokens = authService.refreshAccessToken(refreshToken);
         return ApiResponse.ok(newTokens);
+    }
+
+    /**
+     * 부모 FCM 토큰 등록 API
+     * [POST] /auth/fcm-token
+     */
+    @PostMapping("/fcm-token")
+    public ApiResponse<Void> registerFcmToken(
+            Authentication authentication,
+            @RequestParam String fcmToken) {
+        Long parentId = Long.parseLong(authentication.getName());
+        authService.updateFcmToken(parentId, fcmToken);
+        return ApiResponse.noContent();
     }
 
     /**

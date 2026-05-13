@@ -46,6 +46,17 @@ public class AuthService {
     private String googleClientId;
 
     /**
+     * 부모 FCM 토큰 등록/갱신
+     */
+    @Transactional
+    public void updateFcmToken(Long parentId, String fcmToken) {
+        Parents parent = parentsRepository.findById(parentId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PARENT_NOT_FOUND));
+        parent.updateFcmToken(fcmToken);
+        log.info("FCM 토큰 등록 완료 - parentId: {}", parentId);
+    }
+
+    /**
      * 아이 기기 로그인 비즈니스 로직
      */
     @Transactional(readOnly = true)

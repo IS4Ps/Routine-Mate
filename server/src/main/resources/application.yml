@@ -69,3 +69,7 @@ jwt:
 
 openai: ${OPENAI_API_KEY}
 
+# Firebase 서비스 계정 키 파일 경로
+firebase:
+  service-account-path: classpath:firebase-service-account.json
+

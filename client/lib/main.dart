@@ -9,13 +9,17 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'view_model/dashboard/dashboard_view_model.dart';
 import 'view_model/quest/quest_view_model.dart';
 import 'view_model/reward/reward_view_model.dart';
+import 'services/fcm_token_service.dart';
 import 'start_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FcmTokenService.handleForegroundMessages();
 
   // 카카오 SDK 초기화
   KakaoSdk.init(

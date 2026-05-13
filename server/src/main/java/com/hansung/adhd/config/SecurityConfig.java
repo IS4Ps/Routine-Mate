@@ -46,6 +46,7 @@ public class SecurityConfig {
                         // ⭐️ 카카오도 무사통과 시키도록 수정!
                         .requestMatchers("/auth/google", "/auth/kakao").permitAll()
                         .requestMatchers("/auth/child/register-by-qr").permitAll()
+                        .requestMatchers("/auth/fcm-token").permitAll()
 
                         // ⭐️ /children 주소로 들어오는 요청은 무조건 인증(토큰)이 필요하다고 못 박음!
                         .requestMatchers("/children/**").authenticated()
