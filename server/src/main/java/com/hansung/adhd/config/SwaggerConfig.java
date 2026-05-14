@@ -35,6 +35,7 @@ public class SwaggerConfig {
                         .description("ADHD 아동 치료 보조 앱 백엔드 API")
                         .version("v1.0.0"))
                 .servers(List.of(
+                        new Server().url("http://100.27.204.252:8080").description("배포 서버"),
                         new Server().url("http://localhost:8080").description("로컬 서버")))
                 // 자물쇠(Security) 기능 추가
                 .addSecurityItem(securityRequirement)
