@@ -81,7 +81,7 @@ public class AuthService {
     }
 
     /**
-     * ⭐️ [NEW] 리프레시 토큰으로 액세스 토큰 재발급 자판기!
+     * ⭐️ [NEW] 리프레시 토큰으로 액세스 토큰 재발급 자판기! (Refresh Token Rotation 적용)
      */
     @Transactional
     public TokenResponseDto refreshAccessToken(String givenRefreshToken) {
@@ -96,13 +96,20 @@ public class AuthService {
         Parents parent = parentsRepository.findByEmail(tokenEntity.getParentEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.PARENT_NOT_FOUND));
 
-        // 3. 부모님 PK와 "ROLE_PARENT" 권한으로 따끈따끈한 새 액세스 토큰 발급!
+        // 3. ⭐️ [보안 강화: Rotation] 사용된 옛날 리프레시 토큰은 과감히 삭제!
+        refreshTokenRepository.delete(tokenEntity);
+
+        // 4. 새로운 액세스 토큰과 리프레시 토큰 한 세트를 새로 뽑는다!
         String newAccessToken = jwtProvider.createAccessToken(parent.getId(), "ROLE_PARENT");
+        String newRefreshToken = jwtProvider.createRefreshToken();
 
-        log.info("새로운 액세스 토큰 발급 완료 - 부모 ID: {}", parent.getId());
+        // 5. 새 리프레시 토큰을 다시 DB에 저장 (이제부터 이 녀석이 진짜!)
+        refreshTokenRepository.save(new RefreshToken(newRefreshToken, parent.getEmail()));
 
-        // 4. 새 토큰과 기존 리프레시 토큰을 담아서 프론트엔드로 배송!
-        return new TokenResponseDto(newAccessToken, givenRefreshToken);
+        log.info("토큰 로테이션 완료 - 부모 ID: {}", parent.getId());
+
+        // 6. 따끈따끈한 새 토큰 세트를 프론트엔드로 배송!
+        return new TokenResponseDto(newAccessToken, newRefreshToken);
     }
 
     /**

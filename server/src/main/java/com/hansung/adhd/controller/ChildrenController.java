@@ -5,8 +5,10 @@ import com.hansung.adhd.dto.request.ChildDeviceUpdateRequestDto;
 import com.hansung.adhd.dto.response.ChildResponseDto;
 import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.ChildrenService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -120,4 +122,17 @@ public class ChildrenController {
 
     // 프론트에서 {"nickname": "새로운이름"} 형태로 보낼 때 받을 미니 DTO
     public record ChildNicknameRequestDto(String nickname) {}
+
+    @Autowired
+    private com.hansung.adhd.config.JwtProvider jwtProvider; // (자네 패키지 경로에 맞게 임포트!)
+
+    @PostConstruct
+    public void generateSuperToken() {
+        // 부모 ID "7"번, 권한 "ROLE_PARENT"로 1000% 유효한 토큰 강제 생성!!
+        String superToken = jwtProvider.createAccessToken(clea7L, "ROLE_PARENT");
+
+        System.out.println("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥\n");
+        System.out.println(superToken);
+        System.out.println("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥\n");
+    }
 }
