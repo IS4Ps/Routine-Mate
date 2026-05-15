@@ -156,19 +156,18 @@ public class PresetService {
                 parent, request.getTitle(), request.getDescription(), null, durationDays);
         routinePresetsRepository.save(preset);
 
-        // 날짜별 dayIndex 계산해서 BigTask에 할당
+        // 날짜별 dayIndex 계산해서 BigTask에 할당 (없는 bigTaskId는 스킵)
         missions.stream()
                 .filter(m -> m.getOriginBigTaskId() != null)
                 .collect(Collectors.toMap(
                         DailyMissions::getOriginBigTaskId,
                         m -> (int) ChronoUnit.DAYS.between(startDate, m.getDate()),
-                        (existing, replacement) -> existing  // 중복 bigTaskId는 첫 번째 유지
+                        (existing, replacement) -> existing
                 ))
-                .forEach((bigTaskId, dayIndex) -> {
-                    PresetBigTasks bigTask = presetBigTasksRepository.findById(bigTaskId)
-                            .orElseThrow(() -> new CustomException(ErrorCode.BIG_TASK_NOT_FOUND));
-                    bigTask.assignToPresetWithDayIndex(preset, dayIndex);
-                });
+                .forEach((bigTaskId, dayIndex) ->
+                        presetBigTasksRepository.findById(bigTaskId)
+                                .ifPresent(bigTask -> bigTask.assignToPresetWithDayIndex(preset, dayIndex))
+                );
 
         return PresetDto.PresetResponse.from(preset);
     }

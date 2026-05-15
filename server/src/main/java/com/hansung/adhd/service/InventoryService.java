@@ -60,10 +60,12 @@ public class InventoryService {
             throw new CustomException(ErrorCode.INSUFFICIENT_LEVEL);
         }
 
-        // 직업 조건 검증
-        if (item.getRequiredJob() != null &&
-                !item.getRequiredJob().getId().equals(child.getJob().getId())) {
-            throw new CustomException(ErrorCode.JOB_NOT_MATCHED);
+        // 직업 조건 검증 (직업 미선택 아이는 직업 제한 아이템 구매 불가)
+        if (item.getRequiredJob() != null) {
+            if (child.getJob() == null ||
+                    !item.getRequiredJob().getId().equals(child.getJob().getId())) {
+                throw new CustomException(ErrorCode.JOB_NOT_MATCHED);
+            }
         }
 
         // 골드 차감
