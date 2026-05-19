@@ -129,7 +129,7 @@ public class ChildrenController {
     @PostConstruct
     public void generateSuperToken() {
         // 부모 ID "7"번, 권한 "ROLE_PARENT"로 1000% 유효한 토큰 강제 생성!!
-        String superToken = jwtProvider.createAccessToken(clea7L, "ROLE_PARENT");
+        String superToken = jwtProvider.createAccessToken(7L, "ROLE_PARENT");
 
         System.out.println("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥\n");
         System.out.println(superToken);

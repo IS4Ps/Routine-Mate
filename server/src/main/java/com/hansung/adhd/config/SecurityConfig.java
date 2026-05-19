@@ -22,10 +22,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
-
-    // 더 이상 스프링 시큐리티가 이 두 녀석을 찾지 않도록 주석 처리!
-    // private final CustomOAuth2UserService customOAuth2UserService;
-    // private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -41,25 +39,32 @@ public class SecurityConfig {
                 // 3. ★ JWT의 핵심: "서버는 기억력이 없다(Stateless)" 선언 ★
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 4. 구역별 출입 통제소 (URL 권한 설정)
+                // 4. 예외 처리 핸들러 등록 (401, 403 에러 커스텀)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
+                )
+
+                // 5. 구역별 출입 통제소 (URL 권한 설정)
                 .authorizeHttpRequests(auth -> auth
                         // 인증 없이 접근 가능한 경로들
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
-                                "/auth/**"
+                                "/auth/**",
+                                "/error" // ⭐️ 에러 발생 시 내부 리다이렉트 허용 (403 방지)
                         ).permitAll()
 
-                        // ⭐️ /children 및 그 하위 경로는 무조건 인증 필요!
-                        .requestMatchers("/children", "/children/**").authenticated()
-                        .requestMatchers("/parents/**").authenticated()
+                        // ⭐️ /api/ 하위의 모든 API와 /children, /parents 경로 인증 필요
+                        .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/children/**", "/parents/**").authenticated()
 
                         // 그 외의 모든 요청도 인증 필요
                         .anyRequest().authenticated()
                 )
 
-                // 5. 문지기 배치 작전!
+                // 6. 문지기 배치 작전!
                 .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

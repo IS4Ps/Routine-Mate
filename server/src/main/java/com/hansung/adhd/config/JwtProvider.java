@@ -46,9 +46,12 @@ public class JwtProvider {
         Date now = new Date();
         Date validity = new Date(now.getTime() + this.accessExpiration); // 지금 시간 + 1시간
 
+        // ⭐️ 권한 이름에 ROLE_ 접두사가 없으면 붙여주는 방어 로직
+        String roleWithPrefix = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+
         return Jwts.builder()
                 .setSubject(userId.toString()) // 토큰의 주인 (보통 ID를 넣음)
-                .claim("role", role)           // 추가 정보 (권한)
+                .claim("role", roleWithPrefix) // 추가 정보 (권한)
                 .setIssuedAt(now)              // 발급 시간
                 .setExpiration(validity)       // 만료 시간
                 .signWith(key, SignatureAlgorithm.HS256) // 아까 만든 비밀키로 도장 쾅!
@@ -64,13 +67,13 @@ public class JwtProvider {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.warn("잘못된 JWT 서명입니다.");
+            log.warn("잘못된 JWT 서명입니다: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
-            log.warn("만료된 JWT 토큰입니다.");
+            log.warn("만료된 JWT 토큰입니다: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
-            log.warn("지원되지 않는 JWT 토큰입니다.");
+            log.warn("지원되지 않는 JWT 토큰입니다: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            log.warn("JWT 토큰이 잘못되었습니다.");
+            log.warn("JWT 토큰이 잘못되었습니다: {}", e.getMessage());
         }
         return false;
     }
@@ -87,20 +90,19 @@ public class JwtProvider {
                 .getBody();
 
         // 2. 내용물 중에서 "role" (권한) 정보를 빼낸다. (예: "ROLE_CHILD" 또는 "ROLE_PARENT")
-        // 만약 권한 정보가 없으면, 허가받지 않은 이상한 토큰이므로 에러를 던진다.
-        if (claims.get("role") == null) {
+        Object roleClaim = claims.get("role");
+        if (roleClaim == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
         // 3. 스프링 시큐리티가 이해할 수 있는 권한 객체(GrantedAuthority) 리스트로 변환!
         Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get("role").toString().split(","))
+                Arrays.stream(roleClaim.toString().split(","))
+                        .map(role -> role.trim().startsWith("ROLE_") ? role.trim() : "ROLE_" + role.trim())
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
         // 4. 시큐리티의 기본 User 객체를 만든다.
-        // (주의: 우리가 만든 엔티티가 아니라 org.springframework.security.core.userdetails.User 임!)
-        // 토큰의 주체(Subject)에 넣어둔 유저 ID를 아이디 자리에 넣고, 비밀번호는 없으니 ""(빈 문자열) 처리.
         User principal = new User(claims.getSubject(), "", authorities);
 
         // 5. 최종적으로 SecurityContext에 들어갈 '인증된 뱃지(Authentication)'를 발급!
