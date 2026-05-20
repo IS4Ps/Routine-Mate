@@ -1,6 +1,8 @@
 spring:
   application:
     name: adhd
+  profiles:
+    active: local   # TODO: 배포 전 반드시 이 줄 삭제!
 
   # 1. MySQL 연결 설정 (AWS EC2)
   datasource:

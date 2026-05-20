@@ -3,6 +3,7 @@ package com.hansung.adhd.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -13,11 +14,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-// 더 이상 사용하지 않는 클래스 임포트 제거 (오류 방지)
-// import com.hansung.adhd.service.CustomOAuth2UserService;
-
+@Profile("!local")  // local 프로파일에서는 LocalSecurityConfig가 대신 동작
 @Configuration
-@EnableWebSecurity // 스프링 시큐리티 필터 체인을 활성화하겠다는 강력한 선언!
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
