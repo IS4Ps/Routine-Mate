@@ -7,6 +7,7 @@ import com.hansung.adhd.dto.response.ChildLinkResponseDto;
 import com.hansung.adhd.dto.response.TokenResponseDto;
 import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class AuthController {
      * [POST] /auth/child/login
      */
     @PostMapping("/child/login")
-    public ApiResponse<TokenResponseDto> childLogin(@RequestBody ChildLoginRequestDto requestDto) {
+    public ApiResponse<TokenResponseDto> childLogin(@Valid @RequestBody ChildLoginRequestDto requestDto) {
         TokenResponseDto tokenResponse = authService.childLogin(requestDto.deviceId());
         return ApiResponse.ok(tokenResponse);
     }
@@ -67,7 +68,7 @@ public class AuthController {
      * [POST] /auth/google
      */
     @PostMapping("/google")
-    public ApiResponse<TokenResponseDto> googleLogin(@RequestBody GoogleLoginRequestDto requestDto) {
+    public ApiResponse<TokenResponseDto> googleLogin(@Valid @RequestBody GoogleLoginRequestDto requestDto) {
         // 1. 프론트가 폰에서 뽑아온 구글 토큰을 매니저에게 토스!
         TokenResponseDto tokenResponse = authService.googleLogin(requestDto.getIdToken());
         // 2. 발급받은 우리 서버 출입증 세트(Access/Refresh)를 예쁘게 포장해서 리턴!
@@ -79,7 +80,7 @@ public class AuthController {
      * [POST] /auth/kakao
      */
     @PostMapping("/kakao")
-    public ApiResponse<TokenResponseDto> kakaoLogin(@RequestBody KakaoLoginRequestDto requestDto) {
+    public ApiResponse<TokenResponseDto> kakaoLogin(@Valid @RequestBody KakaoLoginRequestDto requestDto) {
         // 1. 프론트가 던져준 카카오 액세스 토큰을 매니저에게 토스!
         TokenResponseDto tokenResponse = authService.kakaoLogin(requestDto.getAccessToken());
         // 2. 발급받은 우리 서버 출입증 세트(Access/Refresh)를 예쁘게 포장해서 리턴!

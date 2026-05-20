@@ -1,6 +1,8 @@
 package com.hansung.adhd.dto;
 
 import com.hansung.adhd.domain.AIGeneratedQuizzes;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +17,7 @@ public class AIQuizDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ImageRequest {
+        @NotBlank(message = "이미지 데이터(base64)는 필수입니다.")
         private String imageBase64;
     }
 
@@ -23,8 +26,12 @@ public class AIQuizDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class GenerateRequest {
+        @NotNull(message = "아이 ID는 필수입니다.")
         private Long               childId;
+        
+        @NotBlank(message = "카테고리는 필수입니다.")
         private String             category;    // 예: "수학", "과학"
+        
         private List<ImageRequest> images;      // 여러 장
 
         // 하위 호환 - 1장짜리 기존 방식도 지원
@@ -36,6 +43,7 @@ public class AIQuizDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AnswerRequest {
+        @NotBlank(message = "정답(O 또는 X)은 필수입니다.")
         private String answer; // "O" or "X"
     }
 

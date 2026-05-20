@@ -1,6 +1,10 @@
 package com.hansung.adhd.dto;
 
 import com.hansung.adhd.domain.MinigameLogs;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,9 +18,16 @@ public class MinigameDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateRequest {
+        @NotNull(message = "아이 ID는 필수입니다.")
         private Long    childId;
+        
+        @NotBlank(message = "게임 타입은 필수입니다.")
         private String  gameType;
+        
+        @NotNull(message = "점수는 필수입니다.")
         private Integer score;
+        
+        @NotNull(message = "보상 금액은 필수입니다.")
         private Integer rewardAmount;
     }
 
@@ -44,7 +55,9 @@ public class MinigameDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class GoNoGoStartRequest {
+        @NotNull(message = "아이 ID는 필수입니다.")
         private Long    childId;
+        
         private Integer totalCount;
         private Integer difficulty;
 
@@ -82,8 +95,14 @@ public class MinigameDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class GoNoGoSubmitRequest {
+        @NotNull(message = "아이 ID는 필수입니다.")
         private Long         childId;
+        
+        @NotBlank(message = "세션 ID는 필수입니다.")
         private String       sessionId;
+        
+        @NotEmpty(message = "답변 목록은 필수입니다.")
+        @Valid
         private List<Answer> answers;
     }
 
@@ -106,7 +125,9 @@ public class MinigameDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StroopStartRequest {
+        @NotNull(message = "아이 ID는 필수입니다.")
         private Long    childId;
+        
         private Integer totalCount;
         private Integer difficulty;
 
@@ -145,8 +166,14 @@ public class MinigameDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StroopSubmitRequest {
+        @NotNull(message = "아이 ID는 필수입니다.")
         private Long               childId;
+        
+        @NotBlank(message = "세션 ID는 필수입니다.")
         private String             sessionId;
+        
+        @NotEmpty(message = "답변 목록은 필수입니다.")
+        @Valid
         private List<StroopAnswer> answers;
     }
 
@@ -169,7 +196,9 @@ public class MinigameDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class NBackStartRequest {
+        @NotNull(message = "아이 ID는 필수입니다.")
         private Long    childId;
+        
         private Integer nLevel;      // N 값 (기본 2 → 2-Back)
         private Integer totalCount;  // 자극 수 (기본 20개)
 
@@ -209,8 +238,14 @@ public class MinigameDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class NBackSubmitRequest {
+        @NotNull(message = "아이 ID는 필수입니다.")
         private Long              childId;
+        
+        @NotBlank(message = "세션 ID는 필수입니다.")
         private String            sessionId;
+        
+        @NotEmpty(message = "답변 목록은 필수입니다.")
+        @Valid
         private List<NBackAnswer> answers;
     }
 

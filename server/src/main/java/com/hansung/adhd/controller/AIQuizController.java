@@ -5,6 +5,7 @@ import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.AIQuizService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class AIQuizController {
                description = "학습지 이미지를 분석해서 OX 퀴즈를 생성합니다. 이미지는 Base64로 인코딩해서 보내주세요.")
     @PostMapping("/generate")
     public ResponseEntity<ApiResponse<AIQuizDto.GenerateResponse>> generateQuizzes(
-            @RequestBody AIQuizDto.GenerateRequest request) {
+            @Valid @RequestBody AIQuizDto.GenerateRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(aiQuizService.generateQuizzes(request)));
     }
 
@@ -41,7 +42,7 @@ public class AIQuizController {
     @PostMapping("/{quizId}/answer")
     public ResponseEntity<ApiResponse<AIQuizDto.AnswerResponse>> submitAnswer(
             @PathVariable Long quizId,
-            @RequestBody AIQuizDto.AnswerRequest request) {
+            @Valid @RequestBody AIQuizDto.AnswerRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(aiQuizService.submitAnswer(quizId, request)));
     }
 }

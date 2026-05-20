@@ -5,6 +5,7 @@ import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.OfflineRewardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class OfflineRewardController {
             description = "목표 성공 일수와 보상 내용을 설정합니다. targetPercent 생략 시 70%로 설정됩니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<OfflineRewardDto.RewardResponse>> createReward(
-            @RequestBody OfflineRewardDto.CreateRequest request) {
+            @Valid @RequestBody OfflineRewardDto.CreateRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(offlineRewardService.createReward(request)));
     }
 

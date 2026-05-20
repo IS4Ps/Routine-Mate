@@ -5,6 +5,7 @@ import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.BigTaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ public class BigTaskController {
     @Operation(summary = "BigTask 생성", description = "BigTask와 SmallTask를 함께 생성합니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<BigTaskDto.BigTaskResponse>> createBigTask(
-            @RequestBody BigTaskDto.CreateRequest request) {
+            @Valid @RequestBody BigTaskDto.CreateRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(bigTaskService.createBigTask(request)));
     }
 
@@ -37,7 +38,7 @@ public class BigTaskController {
     @PutMapping("/{bigTaskId}")
     public ResponseEntity<ApiResponse<BigTaskDto.BigTaskResponse>> updateBigTask(
             @PathVariable Long bigTaskId,
-            @RequestBody BigTaskDto.UpdateRequest request) {
+            @Valid @RequestBody BigTaskDto.UpdateRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(bigTaskService.updateBigTask(bigTaskId, request)));
     }
 
