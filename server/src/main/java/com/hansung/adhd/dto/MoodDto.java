@@ -1,6 +1,8 @@
 package com.hansung.adhd.dto;
 
 import com.hansung.adhd.domain.MoodLogs;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,10 +17,18 @@ public class MoodDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateRequest {
+        @NotNull(message = "아이 ID는 필수입니다.")
         private Long      childId;
+        
+        @NotNull(message = "날짜는 필수입니다.")
         private LocalDate date;
+        
+        @NotBlank(message = "주요 감정은 필수입니다.")
         private String    primaryEmotion;
+        
         private String    secondaryEmotion;
+        
+        @NotNull(message = "점수는 필수입니다.")
         private Integer   score;
     }
 

@@ -7,6 +7,7 @@ import com.hansung.adhd.dto.AiRoutineDto;
 import com.hansung.adhd.service.AiRoutineService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class MissionController {
     @Operation(summary = "미션 생성")
     @PostMapping
     public ResponseEntity<ApiResponse<MissionDto.MissionResponse>> createMission(
-            @RequestBody MissionDto.CreateRequest request) {
+            @Valid @RequestBody MissionDto.CreateRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(missionService.createMission(request)));
     }
 
@@ -72,7 +73,7 @@ public class MissionController {
     @PatchMapping("/{missionId}/review")
     public ResponseEntity<ApiResponse<MissionDto.MissionResponse>> reviewMission(
             @PathVariable Long missionId,
-            @RequestBody MissionDto.ReviewRequest request) {
+            @Valid @RequestBody MissionDto.ReviewRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(missionService.reviewMission(missionId, request)));
     }
 

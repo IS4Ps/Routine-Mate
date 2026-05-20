@@ -1,6 +1,8 @@
 package com.hansung.adhd.dto;
 
 import com.hansung.adhd.domain.DailyMissions;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,10 +19,18 @@ public class MissionDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateRequest {
+        @NotNull(message = "아이 ID는 필수입니다.")
         private Long      childId;
+        
+        @NotNull(message = "원본 대과업 ID는 필수입니다.")
         private Long      originBigTaskId;
+        
+        @NotNull(message = "부여된 경험치는 필수입니다.")
         private Integer   assignedExp;
+        
+        @NotNull(message = "날짜는 필수입니다.")
         private LocalDate date;
+        
         private String    startTime;
         private String    endTime;
     }
@@ -30,7 +40,9 @@ public class MissionDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReviewRequest {
+        @NotBlank(message = "상태(APPROVED/REJECTED)는 필수입니다.")
         private String status;
+        
         private String rejectReason;
     }
 

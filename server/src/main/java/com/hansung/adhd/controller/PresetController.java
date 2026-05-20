@@ -6,6 +6,7 @@ import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.PresetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +42,7 @@ public class PresetController {
     @Operation(summary = "프리셋 생성", description = "기존 BigTask들을 묶어서 프리셋을 생성합니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<PresetDto.PresetResponse>> createPreset(
-            @RequestBody PresetDto.CreateRequest request) {
+            @Valid @RequestBody PresetDto.CreateRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(presetService.createPreset(request)));
     }
 
@@ -49,7 +50,7 @@ public class PresetController {
     @PutMapping("/{presetId}")
     public ResponseEntity<ApiResponse<PresetDto.PresetResponse>> updatePreset(
             @PathVariable Long presetId,
-            @RequestBody PresetDto.UpdateRequest request) {
+            @Valid @RequestBody PresetDto.UpdateRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(presetService.updatePreset(presetId, request)));
     }
 
@@ -65,7 +66,7 @@ public class PresetController {
                description = "선택한 날짜의 미션들을 프리셋으로 저장합니다.")
     @PostMapping("/save-from-date")
     public ResponseEntity<ApiResponse<PresetDto.PresetResponse>> saveFromDate(
-            @RequestBody PresetDto.SaveFromDateRequest request) {
+            @Valid @RequestBody PresetDto.SaveFromDateRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(presetService.saveFromDate(request)));
     }
 
@@ -74,7 +75,7 @@ public class PresetController {
     @PostMapping("/{presetId}/load")
     public ResponseEntity<ApiResponse<List<MissionDto.MissionResponse>>> loadPreset(
             @PathVariable Long presetId,
-            @RequestBody PresetDto.LoadRequest request) {
+            @Valid @RequestBody PresetDto.LoadRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(presetService.loadPreset(presetId, request)));
     }
 }

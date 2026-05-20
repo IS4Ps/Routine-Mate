@@ -5,6 +5,7 @@ import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.MinigameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class MinigameController {
     @Operation(summary = "미니게임 결과 저장", description = "미니게임 플레이 결과를 저장하고 골드를 지급합니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<MinigameDto.MinigameResponse>> saveMinigameLog(
-            @RequestBody MinigameDto.CreateRequest request) {
+            @Valid @RequestBody MinigameDto.CreateRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(minigameService.saveMinigameLog(request)));
     }
 }

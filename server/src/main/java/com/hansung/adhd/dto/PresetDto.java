@@ -3,6 +3,9 @@ package com.hansung.adhd.dto;
 import com.hansung.adhd.domain.PresetBigTasks;
 import com.hansung.adhd.domain.PresetSmallTasks;
 import com.hansung.adhd.domain.RoutinePresets;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,11 +21,17 @@ public class PresetDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateRequest {
+        @NotNull(message = "부모 ID는 필수입니다.")
         private Long        parentId;
+        
+        @NotBlank(message = "제목은 필수입니다.")
         private String      title;
+        
         private String      description;
         private String      icon;
         private Integer     durationDays;
+        
+        @NotEmpty(message = "대과업 목록은 필수입니다.")
         private List<Long>  bigTaskIds;
     }
 
@@ -31,7 +40,9 @@ public class PresetDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateRequest {
+        @NotBlank(message = "제목은 필수입니다.")
         private String  title;
+        
         private String  description;
         private String  icon;
         private Integer durationDays;
@@ -42,11 +53,21 @@ public class PresetDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SaveFromDateRequest {
+        @NotNull(message = "부모 ID는 필수입니다.")
         private Long      parentId;
+        
+        @NotNull(message = "아이 ID는 필수입니다.")
         private Long      childId;
+        
+        @NotNull(message = "시작 날짜는 필수입니다.")
         private LocalDate startDate;
+        
+        @NotNull(message = "종료 날짜는 필수입니다.")
         private LocalDate endDate;
+        
+        @NotBlank(message = "제목은 필수입니다.")
         private String    title;
+        
         private String    description;
     }
 
@@ -55,8 +76,12 @@ public class PresetDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoadRequest {
+        @NotNull(message = "아이 ID는 필수입니다.")
         private Long      childId;
+        
+        @NotNull(message = "시작 날짜는 필수입니다.")
         private LocalDate startDate;           // 불러올 시작 날짜
+        
         private Integer   assignedExpPerMission; // 미션당 경험치 (없으면 기본값 20)
 
         public Integer getAssignedExpPerMission() {

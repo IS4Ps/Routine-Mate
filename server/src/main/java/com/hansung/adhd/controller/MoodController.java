@@ -5,6 +5,7 @@ import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.MoodService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +48,7 @@ public class MoodController {
     @Operation(summary = "감정 기록 저장", description = "아이의 감정을 기록합니다. 같은 날짜는 덮어씁니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<MoodDto.MoodResponse>> createMoodLog(
-            @RequestBody MoodDto.CreateRequest request) {
+            @Valid @RequestBody MoodDto.CreateRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(moodService.createMoodLog(request)));
     }
 }

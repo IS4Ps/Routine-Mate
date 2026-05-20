@@ -2,6 +2,9 @@ package com.hansung.adhd.dto;
 
 import com.hansung.adhd.domain.PresetBigTasks;
 import com.hansung.adhd.domain.PresetSmallTasks;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,13 +18,22 @@ public class BigTaskDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateRequest {
+        @NotNull(message = "부모 ID는 필수입니다.")
         private Long    parentId;
+        
+        @NotBlank(message = "제목은 필수입니다.")
         private String  title;
+        
         private String  icon;
+        
+        @NotNull(message = "순서는 필수입니다.")
         private Integer orderIndex;
+        
         private String  startTime;
         private String  endTime;
         private String  tags;
+        
+        @Valid
         private List<SmallTaskCreateRequest> smallTasks;
     }
 
@@ -29,9 +41,13 @@ public class BigTaskDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SmallTaskCreateRequest {
+        @NotBlank(message = "소과업 제목은 필수입니다.")
         private String  title;
+        
         private String  tags;
         private String  difficultyLevel;
+        
+        @NotNull(message = "순서는 필수입니다.")
         private Integer orderIndex;
     }
 
@@ -39,9 +55,14 @@ public class BigTaskDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateRequest {
+        @NotBlank(message = "제목은 필수입니다.")
         private String  title;
+        
         private String  icon;
+        
+        @NotNull(message = "순서는 필수입니다.")
         private Integer orderIndex;
+        
         private String  startTime;
         private String  endTime;
         private String  tags;

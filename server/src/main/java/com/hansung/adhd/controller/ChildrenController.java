@@ -6,6 +6,7 @@ import com.hansung.adhd.dto.response.ChildResponseDto;
 import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.ChildrenService;
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class ChildrenController {
     @PostMapping
     public ResponseEntity<String> createChild(
             Authentication authentication,
-            @RequestBody ChildCreateRequestDto requestDto) {
+            @Valid @RequestBody ChildCreateRequestDto requestDto) {
 
         // 1. 만능 열쇠로 토큰 안의 핵심 값(Subject)을 꺼낸다!
         String tokenValue = authentication.getName();
@@ -56,7 +57,7 @@ public class ChildrenController {
     @PatchMapping("/{childId}/device")
     public ApiResponse<Void> updateChildDevice(
             @PathVariable Long childId,
-            @RequestBody ChildDeviceUpdateRequestDto requestDto,
+            @Valid @RequestBody ChildDeviceUpdateRequestDto requestDto,
             Authentication authentication) {
 
         log.info("아이 기기 번호 변경 요청 - childId: {}, newDeviceId: {}", childId, requestDto.newDeviceId());
@@ -88,7 +89,7 @@ public class ChildrenController {
     @PatchMapping("/{childId}/nickname")
     public ApiResponse<Void> updateChildNickname(
             @PathVariable Long childId,
-            @RequestBody ChildNicknameRequestDto requestDto,
+            @Valid @RequestBody ChildNicknameRequestDto requestDto,
             Authentication authentication) {
 
         Long parentId = Long.parseLong(authentication.getName());
@@ -121,7 +122,10 @@ public class ChildrenController {
     }
 
     // 프론트에서 {"nickname": "새로운이름"} 형태로 보낼 때 받을 미니 DTO
-    public record ChildNicknameRequestDto(String nickname) {}
+    public record ChildNicknameRequestDto(
+            @jakarta.validation.constraints.NotBlank(message = "닉네임은 필수입니다.")
+            String nickname
+    ) {}
 
     @Autowired
     private com.hansung.adhd.config.JwtProvider jwtProvider; // (자네 패키지 경로에 맞게 임포트!)
