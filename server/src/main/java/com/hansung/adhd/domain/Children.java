@@ -30,11 +30,16 @@ public class Children extends BaseEntity {
     @Column(length = 50)
     private String nickname;
 
+    @Builder.Default
+    @Column(nullable = false)
     private Integer level = 1;
 
-    @Column(name = "current_exp")
+    @Builder.Default
+    @Column(name = "current_exp", nullable = false)
     private Integer currentExp = 0;
 
+    @Builder.Default
+    @Column(nullable = false)
     private Integer gold = 0;
 
     @Column(name = "stat_strength")
@@ -55,10 +60,12 @@ public class Children extends BaseEntity {
 
     // ⭐️ [NEW] 1. 골드 획득 및 사용 로직
     public void addGold(Integer amount) {
+        if (this.gold == null) this.gold = 0;
         this.gold += amount;
     }
 
     public void useGold(Integer amount) {
+        if (this.gold == null) this.gold = 0;
         // 골드가 모자란데 아이템을 사려고 하면 에러를 던져서 막기
         if (this.gold < amount) {
             throw new CustomException(ErrorCode.INSUFFICIENT_GOLD);
@@ -68,12 +75,16 @@ public class Children extends BaseEntity {
 
     // ⭐️ [NEW] 2. 경험치 획득 및 레벨업 로직
     public void gainExp(Integer exp) {
+        if (this.currentExp == null) this.currentExp = 0;
+        if (this.level == null) this.level = 1;
         this.currentExp += exp;
         checkLevelUp(); // 경험치를 얻을 때마다 레벨업 조건이 됐는지 깐깐하게 검사
     }
 
     // 레벨업 검사기 (외부에서 함부로 호출 못 하게 private으로 숨김!)
     private void checkLevelUp() {
+        if (this.level == null) this.level = 1;
+        if (this.currentExp == null) this.currentExp = 0;
         // [임시 기획] 다음 레벨로 가기 위한 필요 경험치 = 현재 레벨 * 100
         // (예: 1렙->2렙은 100, 2렙->3렙은 200. 나중에 상의해서 바꾸기)
         int requiredExp = this.level * 100;
