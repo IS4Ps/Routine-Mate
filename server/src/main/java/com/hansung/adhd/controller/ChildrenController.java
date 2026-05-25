@@ -2,6 +2,7 @@ package com.hansung.adhd.controller;
 
 import com.hansung.adhd.dto.request.ChildCreateRequestDto;
 import com.hansung.adhd.dto.request.ChildDeviceUpdateRequestDto;
+import com.hansung.adhd.dto.request.JobSelectRequestDto;
 import com.hansung.adhd.dto.response.ChildResponseDto;
 import com.hansung.adhd.response.ApiResponse;
 import com.hansung.adhd.service.ChildrenService;
@@ -103,8 +104,8 @@ public class ChildrenController {
     @PatchMapping("/{childId}/job")
     public ApiResponse<Void> selectJob(
             @PathVariable Long childId,
-            @RequestParam Long jobId) {
-        childrenService.selectJob(childId, jobId);
+            @RequestBody JobSelectRequestDto requestDto) {
+        childrenService.selectJob(childId, requestDto.getJobId());
         return ApiResponse.noContent();
     }
 
