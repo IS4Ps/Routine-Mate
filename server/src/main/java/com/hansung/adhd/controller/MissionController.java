@@ -48,6 +48,16 @@ public class MissionController {
         return ResponseEntity.ok(ApiResponse.ok(missionService.getWeeklyStats(childId)));
     }
 
+    @Operation(summary = "월간 달성률 조회",
+            description = "year, month를 기준으로 해당 월의 일별 달성 현황과 월간 성공률을 조회합니다.")
+    @GetMapping("/stats/{childId}/monthly")
+    public ResponseEntity<ApiResponse<MissionDto.MonthlyStatsResponse>> getMonthlyStats(
+            @PathVariable Long childId,
+            @RequestParam int year,
+            @RequestParam int month) {
+        return ResponseEntity.ok(ApiResponse.ok(missionService.getMonthlyStats(childId, year, month)));
+    }
+
     @Operation(summary = "미션 생성")
     @PostMapping
     public ResponseEntity<ApiResponse<MissionDto.MissionResponse>> createMission(

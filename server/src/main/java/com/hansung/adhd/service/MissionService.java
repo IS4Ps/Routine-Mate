@@ -235,6 +235,65 @@ public class MissionService {
                 .build();
     }
 
+    // 월간 달성률 통계
+    @Transactional(readOnly = true)
+    public MissionDto.MonthlyStatsResponse getMonthlyStats(Long childId, int year, int month) {
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+
+        List<DailyMissions> monthlyMissions =
+                dailyMissionsRepository.findByChildIdAndDateBetweenAndIsDeletedFalse(childId, startDate, endDate);
+
+        Map<LocalDate, List<DailyMissions>> missionsByDate = monthlyMissions.stream()
+                .collect(Collectors.groupingBy(DailyMissions::getDate));
+
+        List<MissionDto.DailyAchievement> dailyList = new ArrayList<>();
+        int successDays = 0;
+        double totalRate = 0.0;
+        int daysWithMissions = 0;
+
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            List<DailyMissions> dayMissions = missionsByDate.getOrDefault(date, List.of());
+
+            int total = dayMissions.size();
+            int completed = (int) dayMissions.stream()
+                    .filter(m -> "COMPLETED".equals(m.getStatus()) || "APPROVED".equals(m.getStatus()))
+                    .count();
+
+            double rate = (total == 0) ? 0.0 : Math.round(((double) completed / total) * 1000) / 10.0;
+            boolean isSuccess = total > 0 && rate >= SUCCESS_THRESHOLD;
+
+            if (isSuccess) successDays++;
+            if (total > 0) {
+                totalRate += rate;
+                daysWithMissions++;
+            }
+
+            dailyList.add(MissionDto.DailyAchievement.builder()
+                    .date(date)
+                    .totalCount(total)
+                    .completedCount(completed)
+                    .completionRate(rate)
+                    .isSuccess(isSuccess)
+                    .build());
+        }
+
+        double avgRate = daysWithMissions == 0 ? 0.0 : Math.round((totalRate / daysWithMissions) * 10) / 10.0;
+        double monthlySuccessRate = daysWithMissions == 0 ? 0.0 : Math.round(((double) successDays / daysWithMissions) * 1000) / 10.0;
+
+        return MissionDto.MonthlyStatsResponse.builder()
+                .year(year)
+                .month(month)
+                .startDate(startDate)
+                .endDate(endDate)
+                .successDays(successDays)
+                .totalDays(daysWithMissions)
+                .monthlySuccessRate(monthlySuccessRate)
+                .avgCompletionRate(avgRate)
+                .dailyList(dailyList)
+                .build();
+    }
+
     // 스케줄러용
     @Transactional
     public void generateDailyMissionsFromPresets() {

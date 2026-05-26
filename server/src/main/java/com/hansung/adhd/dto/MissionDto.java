@@ -129,6 +129,21 @@ public class MissionDto {
         private List<DailyAchievement> dailyList; // 일별 상세 현황
     }
 
+    /** 월간 달성률 응답 */
+    @Getter
+    @Builder
+    public static class MonthlyStatsResponse {
+        private Integer year;
+        private Integer month;
+        private LocalDate startDate;
+        private LocalDate endDate;
+        private Integer   successDays;
+        private Integer   totalDays;
+        private Double    monthlySuccessRate;
+        private Double    avgCompletionRate;
+        private List<DailyAchievement> dailyList;
+    }
+
     /** 기존 통계 응답 (하위 호환용) */
     @Getter
     @Builder
