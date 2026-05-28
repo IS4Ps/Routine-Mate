@@ -41,6 +41,9 @@ public class ChildrenService {
         Children child = Children.builder()
                 .parent(parent)
                 .nickname(dto.getNickname())
+                .statStrength(0)
+                .statIntelligence(0)
+                .statCreativity(0)
                 // .lastConnectedDeviceId(...) 🚨 삭제!!
                 .build();
 

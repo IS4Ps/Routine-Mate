@@ -42,12 +42,15 @@ public class Children extends BaseEntity {
     @Column(nullable = false)
     private Integer gold = 0;
 
+    @Builder.Default
     @Column(name = "stat_strength")
     private Integer statStrength = 0;
 
+    @Builder.Default
     @Column(name = "stat_intelligence")
     private Integer statIntelligence = 0;
 
+    @Builder.Default
     @Column(name = "stat_creativity")
     private Integer statCreativity = 0;
 
@@ -101,14 +104,17 @@ public class Children extends BaseEntity {
 
     }
     public void gainStatStrength(Integer amount) {
+        if (this.statStrength == null) this.statStrength = 0;
         this.statStrength += amount;
     }
 
     public void gainStatIntelligence(Integer amount) {
+        if (this.statIntelligence == null) this.statIntelligence = 0;
         this.statIntelligence += amount;
     }
 
     public void gainStatCreativity(Integer amount) {
+        if (this.statCreativity == null) this.statCreativity = 0;
         this.statCreativity += amount;
     }
 

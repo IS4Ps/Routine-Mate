@@ -30,6 +30,7 @@ public class FamilyRelations extends BaseEntity {
     @Column(name = "access_level", length = 20)
     private String accessLevel;
 
+    @Builder.Default
     @Column(name = "is_primary")
     private Boolean isPrimary = false;
 

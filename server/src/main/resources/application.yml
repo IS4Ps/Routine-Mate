@@ -66,7 +66,7 @@ springdoc:
 # 6. JWT 암호화 및 토큰 만료 설정
 jwt:
   secret: ${JWT_SECRET}
-  access-expiration: 3600000    # 1시간 (1000ms * 60 * 60)
+  access-expiration: 43200000    # 12시간 (1000ms * 60 * 60 * 12)
   refresh-expiration: 1209600000 # 14일 (1000ms * 60 * 60 * 24 * 14)
 
 openai: ${OPENAI_API_KEY}
