@@ -18,10 +18,8 @@ public class ItemService {
 
     // 상점 아이템 목록 조회
     @Transactional(readOnly = true)
-    public List<ItemDto.ItemResponse> getShopItems(String type,
-                                                    Integer childLevel,
-                                                    Long childJobId) {
-        return itemsRepository.findShopItems(type, childLevel, childJobId)
+    public List<ItemDto.ItemResponse> getShopItems(String type, Long childJobId) {
+        return itemsRepository.findShopItems(type, childJobId)
                 .stream()
                 .map(ItemDto.ItemResponse::from)
                 .toList();

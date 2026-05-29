@@ -24,9 +24,8 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ItemDto.ItemResponse>>> getShopItems(
             @RequestParam(required = false) String type,
-            @RequestParam Integer childLevel,
             @RequestParam Long childJobId) {
         return ResponseEntity.ok(ApiResponse.ok(
-                itemService.getShopItems(type, childLevel, childJobId)));
+                itemService.getShopItems(type, childJobId)));
     }
 }

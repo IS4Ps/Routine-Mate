@@ -278,8 +278,9 @@ public class MissionService {
                     .build());
         }
 
+        int totalDays = startDate.lengthOfMonth();
         double avgRate = daysWithMissions == 0 ? 0.0 : Math.round((totalRate / daysWithMissions) * 10) / 10.0;
-        double monthlySuccessRate = daysWithMissions == 0 ? 0.0 : Math.round(((double) successDays / daysWithMissions) * 1000) / 10.0;
+        double monthlySuccessRate = Math.round(((double) successDays / totalDays) * 1000) / 10.0;
 
         return MissionDto.MonthlyStatsResponse.builder()
                 .year(year)
@@ -287,7 +288,7 @@ public class MissionService {
                 .startDate(startDate)
                 .endDate(endDate)
                 .successDays(successDays)
-                .totalDays(daysWithMissions)
+                .totalDays(totalDays)
                 .monthlySuccessRate(monthlySuccessRate)
                 .avgCompletionRate(avgRate)
                 .dailyList(dailyList)
