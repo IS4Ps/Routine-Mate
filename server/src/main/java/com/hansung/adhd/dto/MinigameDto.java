@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class MinigameDto {
@@ -34,10 +35,11 @@ public class MinigameDto {
     @Getter
     @Builder
     public static class MinigameResponse {
-        private Long    logId;
-        private String  gameType;
-        private Integer score;
-        private Integer rewardAmount;
+        private Long          logId;
+        private String        gameType;
+        private Integer       score;
+        private Integer       rewardAmount;
+        private LocalDateTime createdAt;
 
         public static MinigameResponse from(MinigameLogs log) {
             return MinigameResponse.builder()
@@ -45,6 +47,7 @@ public class MinigameDto {
                     .gameType(log.getGameType())
                     .score(log.getScore())
                     .rewardAmount(log.getRewardAmount())
+                    .createdAt(log.getCreatedAt())
                     .build();
         }
     }
