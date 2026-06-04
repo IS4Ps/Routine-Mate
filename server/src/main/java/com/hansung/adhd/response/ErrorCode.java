@@ -76,7 +76,10 @@ public enum ErrorCode {
     AI_REQUEST_FAILED(500,       "AI 요청 처리에 실패했습니다."),
     QUIZ_NOT_FOUND(404,          "퀴즈를 찾을 수 없습니다."),
     AI_QUIZ_GENERATION_FAILED(500, "AI 퀴즈 생성에 실패했습니다."),
-    QUIZ_ALREADY_SOLVED(400,     "이미 풀었던 퀴즈입니다.");
+    QUIZ_ALREADY_SOLVED(400,     "이미 풀었던 퀴즈입니다."),
+
+    // ── 알림 (NOTIFICATION) ───────────────────────────────
+    NOTIFICATION_NOT_FOUND(404,  "알림을 찾을 수 없습니다.");
 
 
     private final int    code;

@@ -35,6 +35,7 @@ public class MissionService {
     private final PresetSmallTasksRepository presetSmallTasksRepository;
     private final RoutinePresetsRepository routinePresetsRepository;
     private final FcmService fcmService;
+    private final NotificationService notificationService;
 
     private static final double SUCCESS_THRESHOLD = 70.0; // 일별 성공 기준 달성률
     private static final int REWARD_THRESHOLD = 5;        // 주간 보상 기준 성공 일수
@@ -143,12 +144,12 @@ public class MissionService {
 
         Parents parent = child.getParent();
         if (parent != null) {
-            fcmService.sendToParent(
-                    parent.getFcmToken(),
-                    "미션 완료 알림",
-                    (child.getNickname() != null ? child.getNickname() : "아이") +
-                    "님이 '" + mission.getBigTaskTitle() + "' 미션을 완료했습니다. 확인해주세요!"
-            );
+            String title = "미션 완료 알림";
+            String body = (child.getNickname() != null ? child.getNickname() : "아이") +
+                    "님이 '" + mission.getBigTaskTitle() + "' 미션을 완료했습니다. 확인해주세요!";
+
+            fcmService.sendToParent(parent.getFcmToken(), title, body);
+            notificationService.saveNotification(parent, child, mission, title, body);
         }
 
         return MissionDto.MissionResponse.from(mission, List.of());
