@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,16 +41,21 @@ public class MissionService {
     private static final double SUCCESS_THRESHOLD = 70.0; // 일별 성공 기준 달성률
     private static final int REWARD_THRESHOLD = 5;        // 주간 보상 기준 성공 일수
 
+    private static final ZoneId SEOUL = ZoneId.of("Asia/Seoul");
+
     // 오늘의 미션 목록 조회
     @Transactional(readOnly = true)
     public List<MissionDto.MissionResponse> getTodayMissions(Long childId) {
-        List<DailyMissions> missions = dailyMissionsRepository.findByChildIdAndDateAndIsDeletedFalse(childId, LocalDate.now());
+        LocalDate today = LocalDate.now(SEOUL);
+        List<DailyMissions> missions = dailyMissionsRepository.findByChildIdAndDateAndIsDeletedFalse(childId, today);
+        log.info("[미션 조회] childId={}, today={}, 조회된 미션 수={}", childId, today, missions.size());
 
         List<Long> bigTaskIds = missions.stream()
                 .filter(m -> m.getOriginBigTaskId() != null)
                 .map(DailyMissions::getOriginBigTaskId)
                 .distinct()
                 .collect(Collectors.toList());
+        log.info("[미션 조회] bigTaskIds={}", bigTaskIds);
 
         Map<Long, List<MissionDto.SmallTaskResponse>> smallTaskMap =
                 presetSmallTasksRepository.findByBigTaskIdInOrderByOrderIndex(bigTaskIds)
@@ -59,12 +65,19 @@ public class MissionService {
                                 Collectors.mapping(MissionDto.SmallTaskResponse::from, Collectors.toList())
                         ));
 
-        return missions.stream()
-                .map(m -> MissionDto.MissionResponse.from(
-                        m,
-                        smallTaskMap.getOrDefault(m.getOriginBigTaskId(), List.of())
-                ))
-                .collect(Collectors.toList());
+        log.info("[미션 조회] smallTaskMap keys={}", smallTaskMap.keySet());
+        log.info("[미션 조회] 최종 변환 전 missions.size()={}", missions.size());
+
+        List<MissionDto.MissionResponse> result = new ArrayList<>();
+        for (DailyMissions m : missions) {
+            log.info("[미션 조회] 변환 중 missionId={}, originBigTaskId={}", m.getId(), m.getOriginBigTaskId());
+            result.add(MissionDto.MissionResponse.from(
+                    m,
+                    smallTaskMap.getOrDefault(m.getOriginBigTaskId(), List.of())
+            ));
+        }
+        log.info("[미션 조회] 최종 응답 미션 수={}", result.size());
+        return result;
     }
 
     // 날짜별 미션 목록 조회
@@ -132,11 +145,13 @@ public class MissionService {
     public MissionDto.MissionResponse completeMission(Long missionId) {
         DailyMissions mission = getMissionOrThrow(missionId);
 
-        if ("COMPLETED".equals(mission.getStatus())) {
+        if ("COMPLETED".equals(mission.getStatus()) || "APPROVED".equals(mission.getStatus())) {
             throw new CustomException(ErrorCode.INVALID_MISSION_STATUS);
         }
 
-        mission.complete(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        mission.complete(now);
+        mission.approve(now);
 
         Children child = mission.getChild();
         child.gainExp(mission.getAssignedExp());
@@ -300,7 +315,7 @@ public class MissionService {
     @Transactional
     public void generateDailyMissionsFromPresets() {
         log.info("[배치 작업 시작] 오늘의 미션 자동 생성");
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(SEOUL);
 
         List<Children> allChildren = childrenRepository.findAll();
 
@@ -344,7 +359,7 @@ public class MissionService {
                 .orElseThrow(() -> new CustomException(ErrorCode.CHILD_NOT_FOUND));
 
         List<DailyMissions> newMissions = new ArrayList<>();
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(SEOUL);
 
         // AI가 추천해준 목록을 쓱쓱 돌면서 DailyMission 엔티티로 변환!
         for (AiRoutineDto.Recommendation rec : recommendations) {

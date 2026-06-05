@@ -75,3 +75,7 @@ openai: ${OPENAI_API_KEY}
 firebase:
   service-account-path: classpath:firebase-service-account.json
 
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace
+
