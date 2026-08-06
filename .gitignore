@@ -41,3 +41,11 @@ out/
 
 # Firebase 서비스 계정 키 (절대 커밋 금지!)
 **/firebase-service-account.json
+**/firebase-serbice-account.json
+
+# Firebase 클라이언트별 실제 설정
+**/google-services.json
+
+# 로컬 생성 파일과 설치 의존성
+.DS_Store
+node_modules/
